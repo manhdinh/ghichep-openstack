@@ -21,7 +21,7 @@ Mô hình hệ thống :
 ```sh
 service iptables stop
 chkconfig iptables off
-``
+```
  
  - Tải release và tải gói mysql
 ```sh
@@ -38,7 +38,7 @@ cp -p /etc/my.cnf /etc/my.cnf.orig.`date +%F`
 ```
 
  - Chỉnh sửa file config. Thông số **binlog-do-db=mysql** là database admin muốn được replicate.
- 
+```
 cp /etc/my.cnf /etc/my.cnf.orig
 rm -rf /etc/my.cnf
 cat << EOF > /etc/my.cnf
@@ -62,7 +62,7 @@ symbolic-links=0
 log-error=/var/log/mysqld.log
 pid-file=/var/run/mysqld/mysqld.pid
 EOF 
-
+```
 
 
  - Start mysql cùng hệ thống
@@ -114,6 +114,10 @@ scp masterdatabase.sql  root@192.168.10.11:/root/
 cp -p /etc/my.cnf /etc/my.cnf.orig.`date +%F`
 ```
 
+ - Chỉnh sửa file cấu hình mysql
+```sh
+cp /etc/my.cnf /etc/my.cnf.orig
+rm -rf /etc/my.cnf
 cat << EOF > /etc/my.cnf
 [mysqld]
 server-id = 2     
@@ -140,6 +144,7 @@ EOF
 service mysqld start
 chkconfig mysqld on
 ```
+
  - Thực hiện bước secure mysql tương tự node master
 ```sh
 mysql_secure_installation
@@ -262,9 +267,8 @@ service php-fpm restart
 
  - Thực hiện login vào và kiểm tra service Web nginx của từng server : `http://SERVER_IP`
  
-### 3. Cài đặt HAProxy và Keepalived
+### 3. Cài đặt HAProxy và Keepalived (Thực hiện trên cả 2 node)
 
-#### 3.1. Thực hiện trên node MASTER VM1
 
  - Update sysctl
 ```sh
@@ -278,6 +282,9 @@ yum install keepalived -y
 ```
 
  - Cấu hình keepalive. Chú ý thay đổi tham số `VIP` cho phù hợp.
+ 
+ - Thực hiện trên node Master VM1
+ 
 ```sh
 cp /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.orig 
 rm -rf /etc/keepalived/keepalived.conf
@@ -302,12 +309,39 @@ vrrp_instance VI_1 {
 }
 EOF
 ```
+
+ - Thực hiện trên node Master VM2
+```sh
+cp /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.orig 
+rm -rf /etc/keepalived/keepalived.conf
+cat << EOF > /etc/keepalived/keepalived.conf
+vrrp_script chk_haproxy {           
+        script "killall -0 haproxy"     
+        interval 2                      
+        weight 2                        
+}
+
+vrrp_instance VI_1 {
+        interface eth0
+        state BACKUP
+        virtual_router_id 51
+        priority 100                    
+        virtual_ipaddress {
+            192.168.10.15       
+        }
+        track_script {
+            chk_haproxy
+        }
+}
+EOF
+```
+ 
  - Start service keepalived cùng hệ thống
 ```sh
 chkconfig keepalived on && service keepalived start 
 ```
 
- - Install haproxy
+ - Install haproxy ( Thực hiện trên cả 2 node)
 ```sh
 yum install haproxy -y
 ```
