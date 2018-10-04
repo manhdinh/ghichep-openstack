@@ -21,6 +21,7 @@ cdpr -d eno1
 ```
 
 Kết quả trả về nên là port 2/0/11 như sau :
+
 ![kvm](/Service/KVM-note/images/kvm-00.png)
 
 Để cài cdpr check : 
