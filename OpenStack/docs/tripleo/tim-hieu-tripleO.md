@@ -6,4 +6,4 @@ TripleO (OpenStack On OpenStack) là một chương trình tập trung vào vi�
 
 ### 2. Kiến trúc của TripleO
 
-![tripleo](/ghichep-openstack/OpenStack/images/tripleo-00.png)
+![tripleo](/OpenStack/images/tripleo-00.png)
