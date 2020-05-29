@@ -7,3 +7,5 @@ TripleO (OpenStack On OpenStack) là một chương trình tập trung vào vi�
 ### 2. Kiến trúc của TripleO
 
 ![tripleo](/OpenStack/images/tripleo-00.png)
+
+Với TripleO, bạn tạo một "undercloud" (một hệ thống cloud) chứa các thành phần OpenStac
