@@ -21,222 +21,7 @@ IP-PLANNING cho hệ thống
 
 ### 1. Chuẩn bị môi trường
 
-### 1.1. Cài đặt DNS Server cho hệ thống
-
-Director yêu cầu FQDN (fully qualified domain name) cho việc cài đặt và cấu hình. Vì vậy ta cần một DNS server nội bộ cho tripleO. Ở đây tôi sẽ dựng 1 DNS server tại 1 VPS riêng biệt với IP `10.10.30.52`.
-
-Setup hostname cho DNS server 
-
-```sh
-hostnamectl set-hostname dns-server.example
-```
-
-Cài đặt dịch vụ DNS :
-
-```sh
-yum install bind bind-utils bind-chroot caching-nameserver -y
-```
-
-Stop và disable tạm thời dịch vụ
-
-```sh
-systemctl stop named
-systemctl disable named
-```
-
-Copy các file cấu hình mặc định vào thư mục /var/named/chroot/etc/
-
-```sh
-cp -rpvf /usr/share/doc/bind-9.11.4/sample/etc/* /var/named/chroot/etc/
-```
-
-![tripleo](/OpenStack/images/tripleo-06.png)
-
-Lưu ý : thư mục `bind` có thể thay đổi tùy vào phiên bản được cài đặt.
-
-Copy các file liên quan tới zone vào thư mục mới :
-
-```sh
-cp -rpvf /usr/share/doc/bind-9.11.4/sample/var/named/* /var/named/chroot/var/named/
-```
-
-![tripleo](/OpenStack/images/tripleo-07.png)
-
-Chỉnh sửa cấu hình file /var/named/chroot/etc/named.conf
-
-```sh
-cp /var/named/chroot/etc/named.conf /var/named/chroot/etc/named.conf.orig
-rm -rf /var/named/chroot/etc/named.conf
-
-cat << EOF >> /var/named/chroot/etc/named.conf
-options {
-        listen-on port 53 { 127.0.0.1; any; };
-#       listen-on-v6 port 53 { ::1; };
-        directory       "/var/named";
-        dump-file       "/var/named/data/cache_dump.db";
-        statistics-file "/var/named/data/named_stats.txt";
-        memstatistics-file "/var/named/data/named_mem_stats.txt";
-        allow-query     { localhost; any; };
-        allow-query-cache { localhost; any; };
-};
-logging {
-        channel default_debug {
-                file "data/named.run";
-                severity dynamic;
-        };
-};
-
-view my_resolver {
-        match-clients      { localhost; any; };
-        recursion yes;
-        include "/etc/named.rfc1912.zones";
-};
-EOF
-```
-
-Thêm file cấu hình `named.rfc1912.zones`. Trong đó dải cần thực hiện là `10.10.30.0/24`. DNS server là 10.10.30.52 và node `10.10.30.41` được gán tương ứng với tên miền `undercloud-director.example`.
-
-```sh
-cp /var/named/chroot/etc/named.rfc1912.zones /var/named/chroot/etc/named.rfc1912.zones.orig
-rm -rf /var/named/chroot/etc/named.rfc1912.zones
-
-cat << EOF >>
-zone "example" IN {
-        type master;
-        file "example.zone";
-        allow-update { none; };
-};
-zone "30.10.10.in-addr.arpa" IN {
-        type master;
-        file "example.rzone";
-        allow-update { none; };
-};
-EOF 
-```
-
-Các `zone` có nội dung thông tin phải được thêm tại `/var/named/chroot/etc/named.rfc1912.zones`
-
-```sh
-cd /var/named/chroot/var/named/
-cp -p named.localhost  example.zone
-cp -p named.loopback example.rzone
-chown root:named *
-chown -R  named:named data
-```
-
-Thêm các file phân giải tên miền dành cho IP `10.10.30.41` với tên miền `undercloud-director.example`.
-
-```sh
-cat << EOF >> /var/named/chroot/var/named/example.zone
-$TTL 1D
-@       IN SOA   example. root (
-                                        0       ; serial
-                                        1D      ; refresh
-                                        1H      ; retry
-                                        1W      ; expire
-                                        3H )    ; minimum
-        IN NS   example.
-
-                        IN A 10.10.30.52
-undercloud-director     IN A 10.10.30.41
-EOF
-
-cat << EOF >> /var/named/chroot/var/named/example.rzone
-$TTL 1D
-@       IN SOA  example. root.example. (
-                                        0       ; serial
-                                        1D      ; refresh
-                                        1H      ; retry
-                                        1W      ; expire
-                                        3H )    ; minimum
-
-                IN NS   example.
-41              IN PTR  undercloud-director.example.
-EOF
-```
-
-Kiểm tra việc cấu hình đã thành công hay chưa : 
-
-```sh
-named-checkzone undercloud-director.example example.zone
-named-checkzone undercloud-director.example example.rzone
-named-checkconf -t /var/named/chroot/ /etc/named.conf
-echo $?
-```
-![tripleo](/OpenStack/images/tripleo-08.png)
-
-Kết quả như ảnh trên là đã thành công.
-
-
-
-Thực hiện restart dịch vụ `named-chroot` :
-
-```sh
-systemctl restart named-chroot
-```
-
-Tại các node cần phân giải tên miền, trong file `/etc/resolv.conf` cần chứa cấu hình sau : 
-
-```sh
-search example
-nameserver 10.10.30.52
-```
-
-Trong đó `10.10.30.52` là địa chỉ IP của  DNS server.
-
-Tại node cần phân giải, kiểm tra việc phân giải tên miền như sau :
-
-```sh
-dig -x 10.10.30.41
-```
-
-Kết quả như sau : 
-
-![tripleo](/OpenStack/images/tripleo-09.png)
-
-Tiếp tục kiểm tra phân giải tên miền :
-
-```sh
-nslookup undercloud-director.example
-```
-
-![tripleo](/OpenStack/images/tripleo-10.png)
-
-Như vậy là việc chuẩn bi DNS server đã xong.
-
-### 1.2. (Optional) Enable KVM-Nested trên KVM
-
-Đối với môi trường LAB, máy Director là máy ảo và ta cần bật chế độ Nested Virtualization trên KVM như sau : 
-
-- Kiểm tra xem chế độ Nested Virtualization đã được bật chưa 
-```sh
-cat /sys/module/kvm_intel/parameters/nested
-N
-```
-
-Nếu output là `N` nghĩa là Nested KVM đang bị tắt. Ta cần bật lên như sau : 
-```sh
-cat << EOF >> /etc/modprobe.d/kvm-nested.conf
-options kvm-intel nested=1
-options kvm-intel enable_shadow_vmcs=1
-options kvm-intel enable_apicv=1
-options kvm-intel ept=1
-
-modprobe -r kvm_intel
-modprobe -a kvm_intel
-```
-
-- Kiểm tra lại chế độ Nested Virtualization đã được bật chưa 
-```sh
-cat /sys/module/kvm_intel/parameters/nested
-Y
-```
-
-Nếu output là `Y` nghĩa là Nested KVM đang được bật thành công.
-
-## 2. Cài đặt node UnderCloud (Director) (Thực hiện trên node Undercloud)
-
-### 2.1. Bước 1 : Setup stack user và cài đặt 1 số gói cần thiết
+### 1.1. Bước 1 : Setup stack user và cài đặt 1 số gói cần thiết
 
 Chú ý : Để Selinux tại các node ở chế độ `Enforcing` thay vì `Permissve` hoặc `Disabled`.
 
@@ -520,4 +305,815 @@ openstack overcloud profiles list
 ![tripleo](/OpenStack/images/tripleo-20.png)
 
 Trạng thái của `Provision State` cần là `available` như trên.
+
+
+
+## 3 Xử lý Network
+
+### 3.1. Xử lý cấu hình các file Template network
+
+Xử lý file template ~/templates/network_data.yaml
+
+```sh
+- name: Storage
+  vip: true
+  vlan: 14
+  name_lower: storage
+  ip_subnet: '10.0.14.0/24'
+  allocation_pools: [{'start': '10.0.14.81', 'end': '10.0.14.95'}]
+  mtu: 1500
+- name: StorageMgmt
+  name_lower: storage_mgmt
+  vip: true
+  vlan: 15
+  ip_subnet: '10.0.15.0/24'
+  allocation_pools: [{'start': '10.0.15.81', 'end': '10.0.15.95'}]
+  mtu: 1500
+- name: InternalApi
+  name_lower: internal_api
+  vip: true
+  vlan: 11
+  ip_subnet: '10.0.11.0/24'
+  allocation_pools: [{'start': '10.0.11.81', 'end': '10.0.11.95'}]
+  mtu: 1500
+- name: Tenant
+  vip: false  # Tenant network does not use VIPs
+  name_lower: tenant
+  vlan: 12
+  ip_subnet: '10.0.12.0/24'
+  allocation_pools: [{'start': '10.0.12.81', 'end': '10.0.12.95'}]
+  mtu: 1500
+- name: External
+  vip: true
+  name_lower: external
+  vlan: 101
+  ip_subnet: '10.0.0.0/24'
+  allocation_pools: [{'start': '10.0.0.4', 'end': '10.0.0.250'}]
+  gateway_ip: '10.0.0.1'
+  mtu: 1500
+- name: Management
+  # Management network is enabled by default for backwards-compatibility, but
+  # is not included in any roles by default. Add to role definitions to use.
+  enabled: true
+  vip: false  # Management network does not use VIPs
+  name_lower: management
+  vlan: 10
+  ip_subnet: '10.0.10.0/24'
+  allocation_pools: [{'start': '10.0.10.81', 'end': '10.0.10.95'}]
+  gateway_ip: '10.0.10.1'
+```
+
+Render toàn bộ các file dạng Jinja2 sang dạng YAML 
+
+```sh
+cd /usr/share/openstack-tripleo-heat-templates
+./tools/process-templates.py -o ~/openstack-tripleo-heat-templates-rendered
+```
+
+### 3.2. Customize network
+
+Thực hiện cấu hình theo dạng multple NIC. Các file cần thực hiện cấu hình như sau : 
+
+ - File network isolaton : `network-isolation.yaml`
+ - File network defailt : `network-environment.yaml`
+ - File network data tùy chỉnh, dùng để tạo thêm các network từ bên ngoài (Các đường PUBLIC provider network ) : `network_data`
+ - File tùy chỉnh `roles_data` để gán các network mới vào role.
+ - Template network để định nghĩa `NIC layout` cho mỗi node.
+ - File environment để cho phép các NIC. Mặc định sẽ sử dụng các file trong thư mục `environments`.
+ - Bất kỳ file cấu hình tủy chỉnh network của hệ thống.
+
+Bước 1 : tạo thư mục các file cấu hình :
+
+```sh
+ mkdir ~/custom-templates
+ ```
+
+Tại thư mục custom template chứa 3 file cấu hình sau : 
+
+```sh
+~/custom-templates/network.yaml
+~/custom-templates/nic-configs/controller-nics.yaml
+~/custom-templates/nic-configs/compute-nics.yaml
+```
+
+Bước 2 : Thực hiện cấu hình `network.yaml` 
+
+```sh
+resource_registry:
+  OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/custom-templates/nicconfigs/controller-nics.yaml
+  OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/custom-templates/nicconfigs/compute-nics.yaml
+
+parameter_defaults:
+  NeutronBridgeMappings: 'datacentre:br-ex,tenant:br-tenant'
+  NeutronNetworkType: 'vxlan'
+  NeutronTunnelType: 'vxlan'
+  NeutronExternalNetworkBridge: "''"
+
+# Internal API used for private OpenStack Traffic
+  InternalApiNetCidr: 10.0.11.0/24
+  InternalApiAllocationPools: [{'start': '10.0.11.81', 'end': '10.0.11.99'}]
+  InternalApiNetworkVlanID: 11
+
+# Tenant Network Traffic - will be used for VXLAN over VLAN
+  TenantNetCidr: 10.0.12.0/24
+  TenantAllocationPools: [{'start': '10.0.12.81', 'end': '10.0.12.99'}]
+  TenantNetworkVlanID: 12
+
+# Public Storage Access - e.g. Nova/Glance <--> Ceph
+  StorageNetCidr: 10.0.15.0/24
+  StorageAllocationPools: [{'start': '10.0.15.81', 'end': '10.0.15.99'}]
+  StorageNetworkVlanID: 14
+
+# Private Storage Access - i.e. Ceph background cluster/replication
+  StorageMgmtNetCidr: 10.0.15.0/24
+  StorageMgmtAllocationPools: [{'start': '10.0.16.81', 'end': '10.0.16.99'}]
+  StorageMgmtNetworkVlanID: 15
+
+# External Networking Access - Public API Access
+  ExternalNetCidr: 10.0.17.0/24
+
+# Leave room for floating IPs in the External allocation pool (if required)
+ExternalAllocationPools: [{'start': '10.0.17.81', 'end': '10.0.17.100'}]
+# Set to the router gateway on the external network
+  ExternalInterfaceDefaultRoute: 10.0.17.1
+
+# Gateway router for the provisioning network (or Undercloud IP)
+  ControlPlaneDefaultRoute: 10.0.13.80
+# The IP address of the EC2 metadata server. Generally the IP of the Undercloud
+  EC2MetadataIp: 10.0.13.80
+# Define the DNS servers (maximum 2) for the Overcloud nodes
+  DnsServers: ["8.8.8.8","8.8.4.4"]
+```
+
+Bước 3 : Định nghĩa cấu hình NIC của Server
+
+Tại file `netwowrk.yaml` có sử dụng các registry ` ~/custom-templates/nic-configs/` gồm các cấu hình network của Controller và Compute. 
+
+Tạo các file cấu hình như sau : 
+
+```sh
+ mkdir ~/custom-templates/nic-configs
+```
+
+Bước 4 : Tạo file cấu hình `~/custom-templates/nic-configs/controller.yaml`
+
+```sh
+heat_template_version: rocky
+description: >
+  Software Config to drive os-net-config to configure multiple interfaces for the Controller role.
+parameters:
+  ControlPlaneIp:
+    default: ''
+    description: IP address/subnet on the ctlplane network
+    type: string
+  ControlPlaneSubnetCidr:
+    default: ''
+    description: >
+      The subnet CIDR of the control plane network.
+    type: string
+  ControlPlaneDefaultRoute:
+    default: ''
+    description: The default route of the control plane network.
+    type: string
+  ControlPlaneStaticRoutes:
+    default: []
+    description: >
+      Routes for the ctlplane network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  ControlPlaneMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the network.
+    type: number
+
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage network
+    type: string
+  StorageNetworkVlanID:
+    default: 15
+    description: Vlan ID for the storage network traffic.
+    type: number
+  StorageMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      Storage network.
+    type: number
+  StorageInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the storage network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  StorageMgmtIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage_mgmt network
+    type: string
+  StorageMgmtNetworkVlanID:
+    default: 16
+    description: Vlan ID for the storage_mgmt network traffic.
+    type: number
+  StorageMgmtMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      StorageMgmt network.
+    type: number
+  StorageMgmtInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the storage_mgmt network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  InternalApiIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal_api network
+    type: string
+  InternalApiNetworkVlanID:
+    default: 11
+    description: Vlan ID for the internal_api network traffic.
+    type: number
+  InternalApiMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      InternalApi network.
+    type: number
+  InternalApiInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the internal_api network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  TenantIpSubnet:
+    default: ''
+    description: IP address/subnet on the tenant network
+    type: string
+  TenantNetworkVlanID:
+    default: 12
+    description: Vlan ID for the tenant network traffic.
+    type: number
+  TenantMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      Tenant network.
+    type: number
+  TenantInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the tenant network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  ExternalIpSubnet:
+    default: ''
+    description: IP address/subnet on the external network
+    type: string
+  ExternalNetworkVlanID:
+    default: 17
+    description: Vlan ID for the external network traffic.
+    type: number
+  ExternalMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      External network.
+    type: number
+  ExternalInterfaceDefaultRoute:
+    default: ''
+    description: default route for the external network
+    type: string
+  ExternalInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the external network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+
+  DnsServers: # Override this via parameter_defaults
+    default: []
+    description: >
+      DNS servers to use for the Overcloud 
+    type: comma_delimited_list
+  DnsSearchDomains: # Override this via parameter_defaults
+    default: []
+    description: A list of DNS search domains to be added (in order) to resolv.conf.
+    type: comma_delimited_list
+resources:
+  OsNetConfigImpl:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config:
+        str_replace:
+          template:
+            get_file: ../../scripts/run-os-net-config.sh
+          params:
+            $network_config:
+              network_config:
+              - type: interface
+                name: eth3
+                mtu:
+                  get_param: ControlPlaneMtu
+                use_dhcp: false
+                dns_servers:
+                  get_param: DnsServers
+                domain:
+                  get_param: DnsSearchDomains
+                addresses:
+                - ip_netmask:
+                    list_join:
+                    - /
+                    - - get_param: ControlPlaneIp
+                      - get_param: ControlPlaneSubnetCidr
+                routes:
+                  list_concat_unique:
+                    - get_param: ControlPlaneStaticRoutes
+              - type: interface
+                name: eth4
+                mtu:
+                  get_param: StorageMtu
+                use_dhcp: false
+              - type: vlan
+                device: eth4
+                mtu:
+                  get_param: StorageMtu
+                vlan_id:
+                  get_param: StorageNetworkVlanID
+                addresses:
+                - ip_netmask:
+                    get_param: StorageIpSubnet
+                routes:
+                  list_concat_unique:
+                    - get_param: StorageInterfaceRoutes
+              - type: interface
+                name: eth5
+                mtu:
+                  get_param: StorageMgmtMtu
+                use_dhcp: false
+              - type: vlan
+                device: eth5
+                mtu:
+                  get_param: StorageMgmtMtu
+                vlan_id:
+                  get_param: StorageMgmtNetworkVlanID
+                addresses:
+                - ip_netmask:
+                    get_param: StorageMgmtIpSubnet
+                routes:
+                  list_concat_unique:
+                    - get_param: StorageMgmtInterfaceRoutes
+              - type: interface
+                name: eth1
+                mtu:
+                  get_param: InternalApiMtu
+                use_dhcp: false
+              - type: vlan
+                device: eth1
+                mtu:
+                  get_param: InternalApiMtu
+                vlan_id:
+                  get_param: InternalApiNetworkVlanID
+                addresses:
+                - ip_netmask:
+                    get_param: InternalApiIpSubnet
+                routes:
+                  list_concat_unique:
+                    - get_param: InternalApiInterfaceRoutes
+              - type: ovs_bridge
+                name: br-tenant
+                mtu:
+                  get_param: TenantMtu
+                dns_servers:
+                  get_param: DnsServers
+                use_dhcp: false
+                members:
+                - type: interface
+                  name: eth2
+                  mtu:
+                    get_param: TenantMtu
+                  use_dhcp: false
+                  primary: true
+                - type: vlan
+                  mtu:
+                    get_param: TenantMtu
+                  vlan_id:
+                    get_param: TenantNetworkVlanID
+                  addresses:
+                  - ip_netmask:
+                      get_param: TenantIpSubnet
+                  routes:
+                    list_concat_unique:
+                      - get_param: TenantInterfaceRoutes
+              - type: ovs_bridge
+                name: bridge_name
+                mtu:
+                  get_param: ExternalMtu
+                dns_servers:
+                  get_param: DnsServers
+                use_dhcp: false
+                members:
+                - type: interface
+                  name: eth0
+                  mtu:
+                    get_param: ExternalMtu
+                  use_dhcp: false
+                  primary: true
+                - type: vlan
+                  mtu:
+                    get_param: ExternalMtu
+                  vlan_id:
+                    get_param: ExternalNetworkVlanID
+                  addresses:
+                  - ip_netmask:
+                      get_param: ExternalIpSubnet
+                  routes:
+                    list_concat_unique:
+                      - get_param: ExternalInterfaceRoutes
+                      - - default: true
+                          next_hop:
+                            get_param: ExternalInterfaceDefaultRoute
+outputs:
+  OS::stack_id:
+    description: The OsNetConfigImpl resource.
+    value:
+      get_resource: OsNetConfigImpl
+```
+
+Bước 5 : Tạo file `~/custom-templates/nic-configs/compute.yaml`
+
+```sh
+heat_template_version: rocky
+description: >
+  Software Config to drive os-net-config to configure multiple interfaces for the Compute role.
+parameters:
+  ControlPlaneIp:
+    default: ''
+    description: IP address/subnet on the ctlplane network
+    type: string
+  ControlPlaneSubnetCidr:
+    default: ''
+    description: >
+      The subnet CIDR of the control plane network.
+    type: string
+  ControlPlaneDefaultRoute:
+    default: ''
+    description: The default route of the control plane network.
+    type: string
+  ControlPlaneStaticRoutes:
+    default: []
+    description: >
+      Routes for the ctlplane network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  ControlPlaneMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the network.
+    type: number
+
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage network
+    type: string
+  StorageNetworkVlanID:
+    default: 15
+    description: Vlan ID for the storage network traffic.
+    type: number
+  StorageMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      Storage network.
+    type: number
+  StorageInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the storage network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  InternalApiIpSubnet:
+    default: ''
+    description: IP address/subnet on the internal_api network
+    type: string
+  InternalApiNetworkVlanID:
+    default: 11
+    description: Vlan ID for the internal_api network traffic.
+    type: number
+  InternalApiMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      InternalApi network.
+    type: number
+  InternalApiInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the internal_api network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  TenantIpSubnet:
+    default: ''
+    description: IP address/subnet on the tenant network
+    type: string
+  TenantNetworkVlanID:
+    default: 12
+    description: Vlan ID for the tenant network traffic.
+    type: number
+  TenantMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      Tenant network.
+    type: number
+  TenantInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the tenant network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+
+  ExternalMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      External network.
+    type: number
+
+  DnsServers: # Override this via parameter_defaults
+    default: []
+    description: >
+      DNS servers to use for the Overcloud 
+    type: comma_delimited_list
+  DnsSearchDomains: # Override this via parameter_defaults
+    default: []
+    description: A list of DNS search domains to be added (in order) to resolv.conf.
+    type: comma_delimited_list
+resources:
+  OsNetConfigImpl:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config:
+        str_replace:
+          template:
+            get_file: ../../scripts/run-os-net-config.sh
+          params:
+            $network_config:
+              network_config:
+              - type: interface
+                name: eth3
+                mtu:
+                  get_param: ControlPlaneMtu
+                use_dhcp: false
+                dns_servers:
+                  get_param: DnsServers
+                domain:
+                  get_param: DnsSearchDomains
+                addresses:
+                - ip_netmask:
+                    list_join:
+                    - /
+                    - - get_param: ControlPlaneIp
+                      - get_param: ControlPlaneSubnetCidr
+                routes:
+                  list_concat_unique:
+                    - get_param: ControlPlaneStaticRoutes
+                    - - default: true
+                        next_hop:
+                          get_param: ControlPlaneDefaultRoute
+              - type: interface
+                name: eth4
+                mtu:
+                  get_param: StorageMtu
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: StorageIpSubnet
+                routes:
+                  list_concat_unique:
+                    - get_param: StorageInterfaceRoutes
+              - type: interface
+                name: eth1
+                mtu:
+                  get_param: InternalApiMtu
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: InternalApiIpSubnet
+                routes:
+                  list_concat_unique:
+                    - get_param: InternalApiInterfaceRoutes
+              - type: ovs_bridge
+                name: br-tenant
+                mtu:
+                  get_param: TenantMtu
+                dns_servers:
+                  get_param: DnsServers
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: TenantIpSubnet
+                routes:
+                  list_concat_unique:
+                    - get_param: TenantInterfaceRoutes
+                members:
+                - type: interface
+                  name: eth2
+                  mtu:
+                    get_param: TenantMtu
+                  use_dhcp: false
+                  primary: true
+              - type: ovs_bridge
+                name: bridge_name
+                mtu:
+                  get_param: ExternalMtu
+                dns_servers:
+                  get_param: DnsServers
+                use_dhcp: false
+                members:
+                - type: interface
+                  name: nic6
+                  mtu:
+                    get_param: ExternalMtu
+                  use_dhcp: false
+                  primary: true
+outputs:
+  OS::stack_id:
+    description: The OsNetConfigImpl resource.
+    value:
+      get_resource: OsNetConfigImpl
+```
+
+File cấu hình `~/custom-templates/nic-configs/ceph.yaml`
+
+```sh
+heat_template_version: rocky
+description: >
+  Software Config to drive os-net-config to configure multiple interfaces for the CephStorage role.
+parameters:
+  ControlPlaneIp:
+    default: ''
+    description: IP address/subnet on the ctlplane network
+    type: string
+  ControlPlaneSubnetCidr:
+    default: ''
+    description: >
+    The subnet CIDR of the control plane network. 
+    type: string
+  ControlPlaneDefaultRoute:
+    default: ''
+    description: The default route of the control plane network. 
+    type: string
+  ControlPlaneStaticRoutes:
+    default: []
+    description: >
+      Routes for the ctlplane network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  ControlPlaneMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the network.
+    type: number
+
+  StorageIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage network
+    type: string
+  StorageNetworkVlanID:
+    default: 15
+    description: Vlan ID for the storage network traffic.
+    type: number
+  StorageMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      Storage network.
+    type: number
+  StorageInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the storage network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+  StorageMgmtIpSubnet:
+    default: ''
+    description: IP address/subnet on the storage_mgmt network
+    type: string
+  StorageMgmtNetworkVlanID:
+    default: 16
+    description: Vlan ID for the storage_mgmt network traffic.
+    type: number
+  StorageMgmtMtu:
+    default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      StorageMgmt network.
+    type: number
+  StorageMgmtInterfaceRoutes:
+    default: []
+    description: >
+      Routes for the storage_mgmt network traffic.
+      JSON route e.g. [{'destination':'10.0.0.0/16', 'nexthop':'10.0.0.1'}]
+      Unless the default is changed, the parameter is automatically resolved
+      from the subnet host_routes attribute.
+    type: json
+
+  DnsServers: # Override this via parameter_defaults
+    default: []
+    description: >
+      DNS servers to use for the Overcloud 
+    type: comma_delimited_list
+  DnsSearchDomains: # Override this via parameter_defaults
+    default: []
+    description: A list of DNS search domains to be added (in order) to resolv.conf.
+    type: comma_delimited_list
+resources:
+  OsNetConfigImpl:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: script
+      config:
+        str_replace:
+          template:
+            get_file: ../../scripts/run-os-net-config.sh
+          params:
+            $network_config:
+              network_config:
+              - type: interface
+                name: eth0
+                mtu:
+                  get_param: ControlPlaneMtu
+                use_dhcp: false
+                dns_servers:
+                  get_param: DnsServers
+                domain:
+                  get_param: DnsSearchDomains
+                addresses:
+                - ip_netmask:
+                    list_join:
+                    - /
+                    - - get_param: ControlPlaneIp
+                      - get_param: ControlPlaneSubnetCidr
+                routes:
+                  list_concat_unique:
+                    - get_param: ControlPlaneStaticRoutes
+                    - - default: true
+                        next_hop:
+                          get_param: ControlPlaneDefaultRoute
+              - type: interface
+                name: eth1
+                mtu:
+                  get_param: StorageMtu
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: StorageIpSubnet
+                routes:
+                  list_concat_unique:
+                    - get_param: StorageInterfaceRoutes
+              - type: interface
+                name: eth2
+                mtu:
+                  get_param: StorageMgmtMtu
+                use_dhcp: false
+                addresses:
+                - ip_netmask:
+                    get_param: StorageMgmtIpSubnet
+                routes:
+                  list_concat_unique:
+                    - get_param: StorageMgmtInterfaceRoutes
+outputs:
+  OS::stack_id:
+    description: The OsNetConfigImpl resource.
+    value:
+      get_resource: OsNetConfigImpl
+```
 
