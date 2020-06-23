@@ -63,18 +63,22 @@ cp /usr/share/python-tripleoclient/undercloud.conf.sample ~/undercloud.conf
 Chỉnh sửa nội dung file `undercloud.conf` theo IP-PLANNING như sau : 
 ```sh
 [DEFAULT]
-local_ip = 10.10.34.41/24
-undercloud_public_host = 10.10.34.55
-undercloud_admin_host = 10.10.34.56
-undercloud_hostname = undercloud-director.example
+local_ip = 10.0.13.80/24
+undercloud_admin_host = 10.0.13.120
+undercloud_public_host = 10.0.13.121
 [ctlplane-subnet]
-gateway = 10.10.34.41
-local_interface = eth3
-cidr = 10.10.34.0/24
-masquerade_network = 10.10.34.0/24
-dhcp_start = 10.10.34.42
-dhcp_end = 10.10.34.45
-inspection_iprange = 10.10.34.46,10.10.34.50
+cidr = 10.0.13.0/24
+dhcp_end = 10.0.13.110
+dhcp_start = 10.0.13.84
+dns_nameservers = 8.8.8.8
+gateway = 10.0.13.1
+inspection_iprange = 10.0.13.122,10.0.13.48
+```
+
+Đối với môi trường LAB trên ESXI, thực hiện thêm dòng cấu hình sau để ebabke :
+
+```sh
+enabled_hardware_types=idrac,ilo,ipmi,redfish,manual-management
 ```
 
 Thực hiện hạ phiên bản của leatherman để tương thích với phiên bản puppet : 
@@ -112,28 +116,6 @@ openstack image list
 ```
 ![tripleo](/OpenStack/images/tripleo-13.png)
 
-
-### 2.3. Bước 3 : Thêm DNS server vào subnet
-
-Kiểm tra subnet hiện có của TripleO
-
-```sh
-openstack subnet list
-```
-![tripleo](/OpenStack/images/tripleo-14.png)
-
-Thêm DNS server cho subnet :
-
-```sh
-neutron subnet-update 2ee5a9b5-03a6-4de8-826a-490b885c71f3 --dns-nameserver 10.10.34.52
-```
-
-Kiểm tra lại subnet được thêm DNS server :
-```sh
-openstack subnet show 2ee5a9b5-03a6-4de8-826a-490b885c71f3
-```
-
-![tripleo](/OpenStack/images/tripleo-15.png)
 
 ### 2.4. Bước 4 : Tạo vm cho Controller và Compute (Thực hiện trên KVM)
 
