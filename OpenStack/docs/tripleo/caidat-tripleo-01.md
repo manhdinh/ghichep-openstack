@@ -1117,3 +1117,67 @@ outputs:
       get_resource: OsNetConfigImpl
 ```
 
+Tạo file ` ~/custom-templates/layout.yaml`
+
+```sh
+resource_registry:
+  OS::TripleO::Controller::Ports::InternalApiPort: /usr/share/openstack-tripleo-heattemplates/network/ports/internal_api_from_pool.yaml
+  OS::TripleO::Controller::Ports::TenantPort: /usr/share/openstack-tripleo-heattemplates/network/ports/tenant_from_pool.yaml
+  OS::TripleO::Controller::Ports::StoragePort: /usr/share/openstack-tripleo-heattemplates/network/ports/storage_from_pool.yaml
+  OS::TripleO::Controller::Ports::StorageMgmtPort: /usr/share/openstack-tripleo-heattemplates/network/ports/storage_mgmt_from_pool.yaml
+
+  OS::TripleO::Compute::Ports::InternalApiPort: /usr/share/openstack-tripleo-heattemplates/network/ports/internal_api_from_pool.yaml
+  OS::TripleO::Compute::Ports::TenantPort: /usr/share/openstack-tripleo-heattemplates/network/ports/tenant_from_pool.yaml
+  OS::TripleO::Compute::Ports::StoragePort: /usr/share/openstack-tripleo-heattemplates/network/ports/storage_from_pool.yaml
+  OS::TripleO::Compute::Ports::StorageMgmtPort: /usr/share/openstack-tripleo-heattemplates/network/ports/storage_mgmt_from_pool.yaml
+
+parameter_defaults:
+  NtpServer: 10.0.13.1
+  ControllerCount: 3
+  ComputeCount: 3
+  CephStorageCount: 0
+
+  ControllerSchedulerHints:
+  'capabilities:node': 'controller-%index%'
+  NovaComputeSchedulerHints:
+  'capabilities:node': 'compute-%index%'
+  CephStorageSchedulerHints:
+  'capabilities:node': 'ceph-storage-%index%'
+
+  ControllerIPs:
+  internal_api:
+  - 10.0.11.81
+  - 10.0.11.82
+  - 10.0.11.83
+  tenant:
+  - 10.0.12.81
+  - 10.0.12.82
+  - 10.0.12.83
+  storage:
+  - 10.0.15.81
+  - 10.0.15.82
+  - 10.0.15.83
+  storage_mgmt:
+  - 10.0.16.81
+  - 10.0.16.82
+  - 10.0.16.83
+  ComputeIPs:
+  internal_api:
+  - 10.0.11.84
+  - 10.0.11.85
+  - 10.0.11.86
+  tenant:
+  - 10.0.12.84
+  - 10.0.12.85
+  - 10.0.12.86
+  storage:
+  - 10.0.15.84
+  - 10.0.15.85
+  - 10.0.15.86
+  storage_mgmt:
+  - 10.0.16.84
+  - 10.0.16.85
+  - 10.0.16.86
+
+
+```
