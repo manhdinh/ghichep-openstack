@@ -72,7 +72,7 @@ dhcp_end = 10.0.13.110
 dhcp_start = 10.0.13.84
 dns_nameservers = 8.8.8.8
 gateway = 10.0.13.1
-inspection_iprange = 10.0.13.122,10.0.13.48
+inspection_iprange = 10.0.13.122,10.0.13.148
 ```
 
 Đối với môi trường LAB trên ESXI, thực hiện thêm dòng cấu hình sau để ebabke :
@@ -274,12 +274,13 @@ openstack baremetal node list
 Thực hiện set Role cho các node. 
 
 ```sh
-openstack baremetal node set --property capabilities='profile:control,boot_option:local' $controller1_ID
-openstack baremetal node set --property capabilities='profile:control,boot_option:local' $controller2_ID
-openstack baremetal node set --property capabilities='profile:control,boot_option:local' $controller3_ID
-openstack baremetal node set --property capabilities='profile:compute,boot_option:local' $compute1_ID
-openstack baremetal node set --property capabilities='profile:compute,boot_option:local' $compute2_ID
-openstack baremetal node set --property capabilities='profile:compute,boot_option:local' $compute3_ID
+openstack baremetal node set --property capabilities='node:controller-0,profile:control,boot_option:local' $controller1_ID
+openstack baremetal node set --property capabilities='node:controller-1,profile:control,boot_option:local' $controller2_ID
+openstack baremetal node set --property capabilities='node:controller-2,profile:control,boot_option:local' $controller3_ID
+openstack baremetal node set --property capabilities='node:compute-0,profile:compute,boot_option:local' $compute1_ID
+openstack baremetal node set --property capabilities='node:compute-1,profile:compute,boot_option:local' $compute2_ID
+openstack baremetal node set --property capabilities='node:compute-2,profile:compute,boot_option:local' $compute3_ID
+
 ```
 
 Kiểm tra với câu lệnh :
@@ -303,28 +304,28 @@ Xử lý file template ~/templates/network_data.yaml
   vlan: 15
   name_lower: storage
   ip_subnet: '10.0.15.0/24'
-  allocation_pools: [{'start': '10.0.15.81', 'end': '10.0.15.99'}]
+  allocation_pools: [{'start': '10.0.15.181', 'end': '10.0.15.199'}]
   mtu: 1500
 - name: InternalApi
   name_lower: internal_api
   vip: true
   vlan: 11
   ip_subnet: '10.0.11.0/24'
-  allocation_pools: [{'start': '10.0.11.81', 'end': '10.0.11.99'}]
+  allocation_pools: [{'start': '10.0.11.181', 'end': '10.0.11.199'}]
   mtu: 1500
 - name: Tenant
   vip: false  # Tenant network does not use VIPs
   name_lower: tenant
   vlan: 12
   ip_subnet: '10.0.12.0/24'
-  allocation_pools: [{'start': '10.0.12.81', 'end': '10.0.12.95'}]
+  allocation_pools: [{'start': '10.0.12.181', 'end': '10.0.12.195'}]
   mtu: 1500
 - name: External
   vip: true
   name_lower: external
   vlan: 17
   ip_subnet: '10.0.17.0/24'
-  allocation_pools: [{'start': '10.0.17.4', 'end': '10.0.17.250'}]
+  allocation_pools: [{'start': '10.0.17.181', 'end': '10.0.17.199'}]
   gateway_ip: '10.0.17.1'
   mtu: 1500
 ```
@@ -340,15 +341,28 @@ cd /usr/share/openstack-tripleo-heat-templates
 
 Thực hiện cấu hình theo dạng multple NIC. Các file cần thực hiện cấu hình như sau : 
 
- - File network defailt : `network-environment.yaml`
+ - File network isolaton : `network-isolation.yaml`
+ - File network default : `network-environment.yaml`
  - File network data tùy chỉnh, dùng để tạo thêm các network từ bên ngoài (Các đường PUBLIC provider network ) : `network_data`
  - File tùy chỉnh `roles_data` để gán các network mới vào role.
  - Template network để định nghĩa `NIC layout` cho mỗi node.
  - File environment để cho phép các NIC. Mặc định sẽ sử dụng các file trong thư mục `environments`.
  - Bất kỳ file cấu hình tủy chỉnh network của hệ thống.
 
+Bước 1 : tạo thư mục các file cấu hình :
 
-Bước 1 : Thực hiện cấu hình `/home/stack/templates/network-environment.yaml` 
+```sh
+ mkdir ~/custom-templates
+ ```
+
+Tại thư mục custom template chứa 3 file cấu hình sau : 
+
+```sh
+/home/stack/templates/custom-nics/controller.yaml
+/home/stack/templates/custom-nics/compute.yaml
+```
+
+Bước 2 : Thực hiện cấu hình `/home/stack/templates/network-environment.yaml` 
 
 ```sh
 
@@ -358,38 +372,44 @@ resource_registry:
 
 parameter_defaults:
   StorageNetCidr: '10.0.15.0/24'
-  StorageAllocationPools: [{'start': '10.0.15.81', 'end': '10.0.15.99'}]
+  StorageAllocationPools: [{'start': '10.0.15.181', 'end': '10.0.15.199'}]
   StorageNetworkVlanID: 15
 
   InternalApiNetCidr: '10.0.11.0/24'
-  InternalApiAllocationPools: [{'start': '10.0.15.81', 'end': '10.0.11.99'}]
+  InternalApiAllocationPools: [{'start': '10.0.11.181', 'end': '10.0.11.199'}]
   InternalApiNetworkVlanID: 11
 
   TenantNetCidr: '10.0.12.0/24'
-  TenantAllocationPools: [{'start': '10.0.12.81', 'end': '10.0.12.99'}]
+  TenantAllocationPools: [{'start': '10.0.12.181', 'end': '10.0.12.199'}]
   TenantNetworkVlanID: 12
   TenantNetPhysnetMtu: 1500
 
   ExternalNetCidr: '10.0.17.0/24'
-  ExternalAllocationPools: [{'start': '10.0.17.81', 'end': '10.0.17.99'}]
+  ExternalAllocationPools: [{'start': '10.0.17.181', 'end': '10.0.17.199'}]
   ExternalInterfaceDefaultRoute: '10.0.17.1'
   ExternalNetworkVlanID: 17
+
+  ControlFixedIPs: [{'ip_address':'10.0.13.100'}]
+  InternalApiVirtualFixedIPs: [{'ip_address':'10.0.11.100'}]
+  PublicVirtualFixedIPs: [{'ip_address':'10.0.17.100'}]
+  StorageVirtualFixedIPs: [{'ip_address':'10.0.15.100'}]
+  RedisVirtualFixedIPs: [{'ip_address':'10.0.11.101'}]
 
   DnsServers: []
   NeutronNetworkType: 'geneve,vlan'
   NeutronNetworkVLANRanges: 'datacentre:1:1000'
-
 ```
 
 Bước 3 : Định nghĩa cấu hình NIC của Server
 
-Tại file `network-environment.yaml` có sử dụng các registry gồm các cấu hình network của Controller và Compute. 
+Copy file config NIC vào thư mục chứa file câu hình của Controller và Compute : 
+```sh
+cp /usr/share/openstack-tripleo-heat-templates/network/scripts/run-os-net-config.sh /home/stack/templates/custom-nics/
+```
+
+Tại file `netwowrk-environment.yaml` có sử dụng các registry  gồm các cấu hình network của Controller và Compute. 
 
 Tạo các file cấu hình như sau : 
-
-```sh
- mkdir /home/stack/templates/custom-nics/
-```
 
 Bước 4 : Tạo file cấu hình `/home/stack/templates/custom-nics/controller.yaml`
 
@@ -621,6 +641,9 @@ parameters:
     type: number
   StorageMtu:
     default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      Storage network.
     type: number
   StorageInterfaceRoutes:
     default: []
@@ -656,6 +679,9 @@ parameters:
 
   ExternalMtu:
     default: 1500
+    description: The maximum transmission unit (MTU) size(in bytes) that is
+      guaranteed to pass through the data path of the segments in the
+      External network.
     type: number
 
   DnsServers: # Override this via parameter_defaults
@@ -745,9 +771,10 @@ outputs:
     description: The OsNetConfigImpl resource.
     value:
       get_resource: OsNetConfigImpl
+
 ```
 
-Tạo file `/home/stack/templates/node-info.yaml`
+Tạo file ` /home/stack/templates/node-info.yaml`
 
 ```sh
 parameter_defaults:
@@ -757,95 +784,110 @@ parameter_defaults:
   ComputeCount: 3
 ```
 
-Tạo file `/home/stack/inject-trust-anchor-hiera.yaml`. Trong đó phần `content` là nội dung file cert auto-generate tại `/etc/pki/ca-trust/source/anchors/cm-local-ca.pem`.
+Tạo file `/home/stack/templates/inject-trust-anchor-hiera.yaml` với nội dung sau của `content` là file `/etc/pki/ca-trust/source/anchors/cm-local-ca.pem` :
 
 ```sh
 parameter_defaults:
   CAMap:
     undercloud-ca:
       content: |
------BEGIN CERTIFICATE-----
-MIIDjTCCAnWgAwIBAgIQVQokqJ1HRv2BQ0THxF2MhTANBgkqhkiG9w0BAQsFADBQ
-MSAwHgYDVQQDDBdMb2NhbCBTaWduaW5nIEF1dGhvcml0eTEsMCoGA1UEAwwjNTUw
-YTI0YTgtOWQ0NzQ2ZmQtODE0MzQ0YzctYzQ1ZDhjODUwHhcNMjAwNjE4MTE1MzA2
-WhcNMjEwNjE4MTE1MzA2WjBQMSAwHgYDVQQDDBdMb2NhbCBTaWduaW5nIEF1dGhv
-cml0eTEsMCoGA1UEAwwjNTUwYTI0YTgtOWQ0NzQ2ZmQtODE0MzQ0YzctYzQ1ZDhj
-ODUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQD3d5u9kzHdsw27n4jX
-SdyITIH9dCRVCntjpx62XOAR1ESwJYJu2Tpg2dNyFDbeFMIYgu+xzztYQFRh6CoI
-8Ci0QmWm/iSmft0oNkGXLxLhA6fcBpdG9C9rf5dYdSVivPSmaoJ7oS3XK5N8W/+F
-t6u30cZt3cpq7JKW9ZpdhrkVGQSWl1RFi9DHOrDqCGxIZB508y7VOXMwMJBym9ka
-IaJ83KHfqyn8QCX8Vl5SOLS57I/8KKlFUoQA5o0uRMZueN6aS8QTWgZaRV2GxYKv
-Z+xK8bt6fYNw1uzBfRaCaeYMxcxGDRacFTBm8tk4mTZjz/YzGHgmreT5cdP8mudg
-tlqtAgMBAAGjYzBhMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFH+fyot0ecep
-FwBz42z3RrQXAJrkMB8GA1UdIwQYMBaAFH+fyot0ecepFwBz42z3RrQXAJrkMA4G
-A1UdDwEB/wQEAwIBhjANBgkqhkiG9w0BAQsFAAOCAQEAsovi3DdzB1FxyFgDy6//
-J7sMjcLsuyjelKa7gE8ZuhiEdaatGfBT1/upi2bckhxOEv5B8CkjWYc32iExHl95
-Igh94QNFpoNOr9Mz14t4dJPgcLLkapqdteJwhO9JJBIt0flvaiu4sC12ANQd79Il
-ZXmhA8y85rf+EWG5mLa4Q9yDdflb2PRy3sGQKpHnDzWcJUUTyw9Y7qsqjBeMPjUp
-mEowxB4vi+btU63wSRs+MIM08+n5mE8/ID41P6Z+ZJYIr6tt59ibq5AnUJ2pAts+
-B6cxBGExQ2dEaoZBK5F4AQCouvaOsMGYg+HkzTVfsVCpZO9iWYiHs2RjYm+qmgSO
-Rg==
------END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+      MIIDjTCCAnWgAwIBAgIQVQokqJ1HRv2BQ0THxF2MhTANBgkqhkiG9w0BAQsFADBQ
+      MSAwHgYDVQQDDBdMb2NhbCBTaWduaW5nIEF1dGhvcml0eTEsMCoGA1UEAwwjNTUw
+      YTI0YTgtOWQ0NzQ2ZmQtODE0MzQ0YzctYzQ1ZDhjODUwHhcNMjAwNjE4MTE1MzA2
+      WhcNMjEwNjE4MTE1MzA2WjBQMSAwHgYDVQQDDBdMb2NhbCBTaWduaW5nIEF1dGhv
+      cml0eTEsMCoGA1UEAwwjNTUwYTI0YTgtOWQ0NzQ2ZmQtODE0MzQ0YzctYzQ1ZDhj
+      ODUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQD3d5u9kzHdsw27n4jX
+      SdyITIH9dCRVCntjpx62XOAR1ESwJYJu2Tpg2dNyFDbeFMIYgu+xzztYQFRh6CoI
+      8Ci0QmWm/iSmft0oNkGXLxLhA6fcBpdG9C9rf5dYdSVivPSmaoJ7oS3XK5N8W/+F
+      t6u30cZt3cpq7JKW9ZpdhrkVGQSWl1RFi9DHOrDqCGxIZB508y7VOXMwMJBym9ka
+      IaJ83KHfqyn8QCX8Vl5SOLS57I/8KKlFUoQA5o0uRMZueN6aS8QTWgZaRV2GxYKv
+      Z+xK8bt6fYNw1uzBfRaCaeYMxcxGDRacFTBm8tk4mTZjz/YzGHgmreT5cdP8mudg
+      tlqtAgMBAAGjYzBhMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFH+fyot0ecep
+      FwBz42z3RrQXAJrkMB8GA1UdIwQYMBaAFH+fyot0ecepFwBz42z3RrQXAJrkMA4G
+      A1UdDwEB/wQEAwIBhjANBgkqhkiG9w0BAQsFAAOCAQEAsovi3DdzB1FxyFgDy6//
+      J7sMjcLsuyjelKa7gE8ZuhiEdaatGfBT1/upi2bckhxOEv5B8CkjWYc32iExHl95
+      Igh94QNFpoNOr9Mz14t4dJPgcLLkapqdteJwhO9JJBIt0flvaiu4sC12ANQd79Il
+      ZXmhA8y85rf+EWG5mLa4Q9yDdflb2PRy3sGQKpHnDzWcJUUTyw9Y7qsqjBeMPjUp
+      mEowxB4vi+btU63wSRs+MIM08+n5mE8/ID41P6Z+ZJYIr6tt59ibq5AnUJ2pAts+
+      B6cxBGExQ2dEaoZBK5F4AQCouvaOsMGYg+HkzTVfsVCpZO9iWYiHs2RjYm+qmgSO
+      Rg==
+      -----END CERTIFICATE-----
+
 ```
-Tạo file ` ~/custom-templates/layout.yaml`
 
 ```sh
-resource_registry:
-  OS::TripleO::Controller::Ports::InternalApiPort: /usr/share/openstack-tripleo-heat/templates/network/ports/internal_api_from_pool.yaml
-  OS::TripleO::Controller::Ports::TenantPort: /usr/share/openstack-tripleo-heat/templates/network/ports/tenant_from_pool.yaml
-  OS::TripleO::Controller::Ports::StoragePort: /usr/share/openstack-tripleo-heat/templates/network/ports/storage_from_pool.yaml
-  OS::TripleO::Controller::Ports::StorageMgmtPort: /usr/share/openstack-tripleo-heat/templates/network/ports/storage_mgmt_from_pool.yaml
 
-  OS::TripleO::Compute::Ports::InternalApiPort: /usr/share/openstack-tripleo-heat/templates/network/ports/internal_api_from_pool.yaml
-  OS::TripleO::Compute::Ports::TenantPort: /usr/share/openstack-tripleo-heat/templates/network/ports/tenant_from_pool.yaml
-  OS::TripleO::Compute::Ports::StoragePort: /usr/share/openstack-tripleo-heat/templates/network/ports/storage_from_pool.yaml
-  OS::TripleO::Compute::Ports::StorageMgmtPort: /usr/share/openstack-tripleo-heat/templates/network/ports/storage_mgmt_from_pool.yaml
+Thực hiện gắn các node cụ thể với mô hình overcloud dự kiến
 
-parameter_defaults:
-  NtpServer: 10.0.13.1
-  ControllerCount: 3
-  ComputeCount: 3
-  CephStorageCount: 0
-
-  ControllerSchedulerHints:
-  'capabilities:node': 'controller-%index%'
-  NovaComputeSchedulerHints:
-  'capabilities:node': 'compute-%index%'
-
-  ControllerIPs:
-  internal_api:
-  - 10.0.11.81
-  - 10.0.11.82
-  - 10.0.11.83
-  tenant:
-  - 10.0.12.81
-  - 10.0.12.82
-  - 10.0.12.83
-  storage:
-  - 10.0.15.81
-  - 10.0.15.82
-  - 10.0.15.83
-  storage_mgmt:
-  - 10.0.16.81
-  - 10.0.16.82
-  - 10.0.16.83
-  ComputeIPs:
-  internal_api:
-  - 10.0.11.84
-  - 10.0.11.85
-  - 10.0.11.86
-  tenant:
-  - 10.0.12.84
-  - 10.0.12.85
-  - 10.0.12.86
-  storage:
-  - 10.0.15.84
-  - 10.0.15.85
-  - 10.0.15.86
-  storage_mgmt:
-  - 10.0.16.84
-  - 10.0.16.85
-  - 10.0.16.86
-
-
+```sh
+openstack baremetal node set --property capabilities='node:controller-0,boot_option:local' $controller1_ID
+openstack baremetal node set --property capabilities='node:controller-1,boot_option:local' $controller2_ID
+openstack baremetal node set --property capabilities='node:controller-2,boot_option:local' $controller3_ID
+openstack baremetal node set --property capabilities='node:compute-0,boot_option:local' $compute1_ID
+openstack baremetal node set --property capabilities='node:compute-1,boot_option:local' $compute2_ID
+openstack baremetal node set --property capabilities='node:compute-2,boot_option:local' $compute3_ID
 ```
+
+Đặt file map hostname của các node `/home/stack/templates/scheduler_hints_env.yaml`
+
+```sh
+parameter_defaults:
+  ControllerSchedulerHints:
+    'capabilities:node': 'controller-%index%'
+  ComputeSchedulerHints:
+    'capabilities:node': 'compute-%index%'
+  HostnameMap:
+    overcloud-controller-0: overcloud-controller-test-0
+    overcloud-controller-1: overcloud-controller-test-1
+    overcloud-controller-2: overcloud-controller-test-2
+    overcloud-compute-0: overcloud-compute-test-0
+    overcloud-compute-1: overcloud-compute-test-1
+    overcloud-compute-2: overcloud-compute-test-2
+```
+
+Gắn cụ thể các IP cố định tới các node `/home/stack/templates/predictive_ips.yaml`
+
+```sh
+parameter_defaults:
+  ControllerIPs:
+    ctlplane:
+    - 10.0.13.131
+    - 10.0.13.132
+    - 10.0.13.133
+    internal_api:
+    - 10.0.11.131
+    - 10.0.11.132
+    - 10.0.11.133
+    tenant:
+    - 10.0.12.131
+    - 10.0.12.132
+    - 10.0.12.133
+    storage:
+    - 10.0.15.131
+    - 10.0.15.132
+    - 10.0.15.133
+    external:
+    - 10.0.17.131
+    - 10.0.17.132
+    - 10.0.17.133
+  ComputeIPs:
+    ctlplane:
+    - 10.0.13.134
+    - 10.0.13.135
+    - 10.0.13.136
+    internal_api:
+    - 10.0.11.134
+    - 10.0.11.135
+    - 10.0.11.136
+    tenant:
+    - 10.0.12.134
+    - 10.0.12.135
+    - 10.0.12.136
+    storage:
+    - 10.0.15.134
+    - 10.0.15.135
+    - 10.0.15.136
+```
+
+Câu lệnh boot : 
