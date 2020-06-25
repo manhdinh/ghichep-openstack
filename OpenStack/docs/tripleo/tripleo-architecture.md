@@ -276,6 +276,8 @@ git clone https://github.com/openstack/tripleo-heat-templates.git
 
 Có rất nhiều Heat template và environment file có trong tổ hợp này. Tuy nhiên, các file chính và quan trọng gồm : 
 
+#### Các file chính : 
+
  - `overcloud.j2.yaml` 
 
 File template chính được dùng để tạo môi trường cho OverCloud. File sử dụng cú pháp `Jinja2` để lặp một số section nhất định trong template để tạo các role tùy chỉnh. Định dạng Jinja2 sẽ được hoàn trả lại thành YAML trong quá trình triển khai OverCloud.
@@ -284,7 +286,6 @@ File template chính được dùng để tạo môi trường cho OverCloud. Fi
 
 File environment chính để tạo môi trường cho OverCloud. File cung cấp tổ hợp các cấu hình cho Puppet module được lưu trữ OverCloud image. Sau khi UnderCloud ghi OverCloud image xuống mỗi node, Heat khởi động cấu hình Puppet cho mỗi node bằng các resource đã được đăng ký trong file environment này. File cũng sử dụng định dang Jinja2 và sẽ được hoàn trả lại thành YAML trong quá trình triển khai OverCloud.
 
-Các file chính : 
 
 - `roles_data.yaml`
 
@@ -302,7 +303,7 @@ File định nghĩa các metadata cho OverCloud plan. File bao gồm ` plan name
 
 Ánh xạ của các `environment file` cho OverCloud plan. File được dùng để mô tả và cho phép các `environment file` thông qua WEB Gui của UnderCloud. Các environment file tùy chỉnh không được định nghĩa trong file `capabilities-map.yaml`  nhưng được phát hiện trong `environment` directory trên OverCloud plan sẽ được liệt kê tại subtab `Other` của `2 Specify Deployment Configuration > Overall Settings` trên Web GUI.
 
-Các thư mục chính : 
+#### Các thư mục chính : 
 
 - `environments`
 
@@ -330,4 +331,5 @@ Các template dùng để cho phép các function bổ sung hoạt động.
 
 Cung cấp các script `first_boot` mà UnderCloud sử dụng khi tạo các node lúc ban đầu.
 
-### 
+### 3.4. Tùy chỉnh cấu hình First Boot.
+

@@ -1104,15 +1104,15 @@ Tạo file ` ~/custom-templates/layout.yaml`
 
 ```sh
 resource_registry:
-  OS::TripleO::Controller::Ports::InternalApiPort: /usr/share/openstack-tripleo-heattemplates/network/ports/internal_api_from_pool.yaml
-  OS::TripleO::Controller::Ports::TenantPort: /usr/share/openstack-tripleo-heattemplates/network/ports/tenant_from_pool.yaml
-  OS::TripleO::Controller::Ports::StoragePort: /usr/share/openstack-tripleo-heattemplates/network/ports/storage_from_pool.yaml
-  OS::TripleO::Controller::Ports::StorageMgmtPort: /usr/share/openstack-tripleo-heattemplates/network/ports/storage_mgmt_from_pool.yaml
+  OS::TripleO::Controller::Ports::InternalApiPort: /usr/share/openstack-tripleo-heat/templates/network/ports/internal_api_from_pool.yaml
+  OS::TripleO::Controller::Ports::TenantPort: /usr/share/openstack-tripleo-heat/templates/network/ports/tenant_from_pool.yaml
+  OS::TripleO::Controller::Ports::StoragePort: /usr/share/openstack-tripleo-heat/templates/network/ports/storage_from_pool.yaml
+  OS::TripleO::Controller::Ports::StorageMgmtPort: /usr/share/openstack-tripleo-heat/templates/network/ports/storage_mgmt_from_pool.yaml
 
-  OS::TripleO::Compute::Ports::InternalApiPort: /usr/share/openstack-tripleo-heattemplates/network/ports/internal_api_from_pool.yaml
-  OS::TripleO::Compute::Ports::TenantPort: /usr/share/openstack-tripleo-heattemplates/network/ports/tenant_from_pool.yaml
-  OS::TripleO::Compute::Ports::StoragePort: /usr/share/openstack-tripleo-heattemplates/network/ports/storage_from_pool.yaml
-  OS::TripleO::Compute::Ports::StorageMgmtPort: /usr/share/openstack-tripleo-heattemplates/network/ports/storage_mgmt_from_pool.yaml
+  OS::TripleO::Compute::Ports::InternalApiPort: /usr/share/openstack-tripleo-heat/templates/network/ports/internal_api_from_pool.yaml
+  OS::TripleO::Compute::Ports::TenantPort: /usr/share/openstack-tripleo-heat/templates/network/ports/tenant_from_pool.yaml
+  OS::TripleO::Compute::Ports::StoragePort: /usr/share/openstack-tripleo-heat/templates/network/ports/storage_from_pool.yaml
+  OS::TripleO::Compute::Ports::StorageMgmtPort: /usr/share/openstack-tripleo-heat/templates/network/ports/storage_mgmt_from_pool.yaml
 
 parameter_defaults:
   NtpServer: 10.0.13.1
