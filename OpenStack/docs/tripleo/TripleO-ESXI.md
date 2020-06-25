@@ -891,3 +891,14 @@ parameter_defaults:
 ```
 
 Câu lệnh boot : 
+	openstack --debug overcloud deploy --templates \
+	-n /home/stack/templates/network_data.yaml \
+	-e /home/stack/templates/network-environment.yaml \
+	-e /home/stack/templates/containers-prepare-parameter.yaml \
+	-e /home/stack/templates/ceph-config.yaml \
+	-e /home/stack/templates/scheduler_hints_env.yaml \
+	-e /home/stack/templates/predictive_ips.yaml \
+	-r /home/stack/templates/roles_data.yaml \
+	--log-file overcloud_deployment.log --ntp-server 10.0.13.1
+	
+	--update-plan-only
