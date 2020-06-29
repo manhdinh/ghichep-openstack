@@ -1529,11 +1529,19 @@ parameter_defaults:
 
 Câu lệnh boot : 
 
-	openstack --debug overcloud deploy --templates \
-	-r /home/stack/overcloud-template/00-roles-data.yaml \
-	-e /home/stack/overcloud-template/01-node-info.yaml \
-	-e /home/stack/overcloud-template/02-network-isolation.yaml \
-
-	--log-file overcloud_deployment.log --ntp-server 10.0.13.1
-	
-	--update-plan-only
+```sh
+openstack overcloud deploy --templates \
+-r /home/stack/custom-templates/01-roles-data.yaml \
+-e /home/stack/custom-templates/02-node-info.yaml \
+-e /home/stack/custom-templates/03-network-isolation.yaml \
+-e /home/stack/custom-templates/04-overcloud_images.yaml \
+-e /home/stack/custom-templates/05-network-environment.yaml \
+-e /home/stack/custom-templates/06-extra-parameters.yaml \
+-e /home/stack/custom-templates/07-predictive-ips.yaml \
+-e /home/stack/custom-templates/08-scheduler-hints-env.yaml \
+-e /home/stack/custom-templates/09-no-tls-endpoint-public.yaml \
+-e /home/stack/custom-templates/10-ceph-external.yaml \
+-e /home/stack/custom-templates/disable-telemetry.yaml \
+-e /home/stack/custom-templates/disable-panko.yaml \
+--log-file overcloud_deployment.log --timeout 360
+```
