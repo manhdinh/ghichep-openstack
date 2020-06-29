@@ -314,9 +314,6 @@ cd /usr/share/openstack-tripleo-heat-templates
 
 Copy file template sang thư mục config
 
-<<<<<<< HEAD
-Tại thư mục custom template chứa 3 file cấu hình sau : 
-=======
 ```sh
 cp /usr/share/openstack-tripleo-heat-templates/roles_data.yaml /home/stack/custom-templates/01-roles-data.yaml
 ```
@@ -328,7 +325,6 @@ Chỉnh sửa giá trị `CountDefault` tại section Controller và Compute th�
 
 Tạo file `/home/stack/custom-templates/02-node-info.yaml` :
 
->>>>>>> fac8d603e5ee346b5d708ad8d3022661293069c7
 
 ```sh
 parameter_defaults:
@@ -1192,12 +1188,7 @@ resources:
               network_config:
               - type: interface
                 name: ens192
-<<<<<<< HEAD
-                mtu:
-                  get_param: ControlPlaneMtu
-=======
                 mtu: 1500
->>>>>>> fac8d603e5ee346b5d708ad8d3022661293069c7
                 use_dhcp: false
                 dns_servers:
                   get_param: DnsServers
@@ -1227,13 +1218,7 @@ resources:
                     - get_param: StorageInterfaceRoutes
               - type: interface
                 name: ens256
-<<<<<<< HEAD
-                mtu:
-                  get_param: InternalApiMtu
-                use_dhcp: false
-=======
                 mtu: 1500
->>>>>>> fac8d603e5ee346b5d708ad8d3022661293069c7
                 addresses:
                 - ip_netmask:
                     get_param: InternalApiIpSubnet
@@ -1254,12 +1239,6 @@ resources:
                 members:
                 - type: interface
                   name: ens224
-<<<<<<< HEAD
-                  mtu:
-                    get_param: TenantMtu
-                  use_dhcp: false
-                  primary: true             
-=======
                   mtu: 1500
                   primary: true           
               - type: ovs_bridge
@@ -1270,7 +1249,6 @@ resources:
                   name: ens193
                   mtu: 1500
                   primary: true                          
->>>>>>> fac8d603e5ee346b5d708ad8d3022661293069c7
 outputs:
   OS::stack_id:
     description: The OsNetConfigImpl resource.
