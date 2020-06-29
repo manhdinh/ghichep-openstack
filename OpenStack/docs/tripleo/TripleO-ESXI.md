@@ -384,170 +384,166 @@ resource_registry:
 Tạo file `/home/stack/custom-templates/04-overcloud_images.yaml`
 
 ```sh
-openstack overcloud container image prepare \
-  --push-destination=10.0.13.80:8787 \
-  --namespace=docker.io/tripleotrain/ \
-  --output-env-file=/home/stack/custom-templates/04-overcloud_images.yaml \
-  --prefix=openstack- \
-  --output-images-file /home/stack/custom-templates/local_registry_images.yaml
+openstack overcloud container image prepare --push-destination=10.0.13.80:8787 --environment-file containers-prepare-parameter.yaml --roles-file roles_data.yaml --output-env-file /home/stack/custom-templates/04-overcloud_images.yaml --output-images-file /home/stack/custom-templates/local_registry_images.yaml
+
 ```
 
 Nội dung file sẽ như sau : 
 
 ```sh
-# Generated with the following on 2020-06-29T17:57:06.899964
+# Generated with the following on 2020-06-29T23:25:11.675183
 #
-#   openstack overcloud container image prepare --push-destination=10.0.13.80:8787 --namespace=docker.io/tripleotrain/ --output-env-file=/home/stack/custom-templates/04-overcloud_images.yaml --prefix=openstack- --output-images-file /home/stack/custom-templates/local_registry_images.yaml
+#   openstack overcloud container image prepare --push-destination=10.0.13.80:8787 --environment-file containers-prepare-parameter.yaml --roles-file roles_data.yaml --output-env-file /home/stack/custom-templates/04-overcloud_images.yaml --output-images-file /home/stack/custom-templates/local_registry_images.yaml
 #
 
 parameter_defaults:
   AlertManagerContainerImage: 10.0.13.80:8787/prom/alertmanager:v0.16.2
-  ContainerAodhApiImage: 10.0.13.80:8787/tripleotrain//openstack-aodh-api:current-tripleo
-  ContainerAodhConfigImage: 10.0.13.80:8787/tripleotrain//openstack-aodh-api:current-tripleo
-  ContainerAodhEvaluatorImage: 10.0.13.80:8787/tripleotrain//openstack-aodh-evaluator:current-tripleo
-  ContainerAodhListenerImage: 10.0.13.80:8787/tripleotrain//openstack-aodh-listener:current-tripleo
-  ContainerAodhNotifierImage: 10.0.13.80:8787/tripleotrain//openstack-aodh-notifier:current-tripleo
-  ContainerBarbicanApiImage: 10.0.13.80:8787/tripleotrain//openstack-barbican-api:current-tripleo
-  ContainerBarbicanConfigImage: 10.0.13.80:8787/tripleotrain//openstack-barbican-api:current-tripleo
-  ContainerBarbicanKeystoneListenerConfigImage: 10.0.13.80:8787/tripleotrain//openstack-barbican-keystone-listener:current-tripleo
-  ContainerBarbicanKeystoneListenerImage: 10.0.13.80:8787/tripleotrain//openstack-barbican-keystone-listener:current-tripleo
-  ContainerBarbicanWorkerConfigImage: 10.0.13.80:8787/tripleotrain//openstack-barbican-worker:current-tripleo
-  ContainerBarbicanWorkerImage: 10.0.13.80:8787/tripleotrain//openstack-barbican-worker:current-tripleo
-  ContainerCeilometerCentralImage: 10.0.13.80:8787/tripleotrain//openstack-ceilometer-central:current-tripleo
-  ContainerCeilometerComputeImage: 10.0.13.80:8787/tripleotrain//openstack-ceilometer-compute:current-tripleo
-  ContainerCeilometerConfigImage: 10.0.13.80:8787/tripleotrain//openstack-ceilometer-central:current-tripleo
-  ContainerCeilometerNotificationImage: 10.0.13.80:8787/tripleotrain//openstack-ceilometer-notification:current-tripleo
+  ContainerAodhApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-aodh-api:current-tripleo
+  ContainerAodhConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-aodh-api:current-tripleo
+  ContainerAodhEvaluatorImage: 10.0.13.80:8787/tripleotrain/centos-binary-aodh-evaluator:current-tripleo
+  ContainerAodhListenerImage: 10.0.13.80:8787/tripleotrain/centos-binary-aodh-listener:current-tripleo
+  ContainerAodhNotifierImage: 10.0.13.80:8787/tripleotrain/centos-binary-aodh-notifier:current-tripleo
+  ContainerBarbicanApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-barbican-api:current-tripleo
+  ContainerBarbicanConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-barbican-api:current-tripleo
+  ContainerBarbicanKeystoneListenerConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-barbican-keystone-listener:current-tripleo
+  ContainerBarbicanKeystoneListenerImage: 10.0.13.80:8787/tripleotrain/centos-binary-barbican-keystone-listener:current-tripleo
+  ContainerBarbicanWorkerConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-barbican-worker:current-tripleo
+  ContainerBarbicanWorkerImage: 10.0.13.80:8787/tripleotrain/centos-binary-barbican-worker:current-tripleo
+  ContainerCeilometerCentralImage: 10.0.13.80:8787/tripleotrain/centos-binary-ceilometer-central:current-tripleo
+  ContainerCeilometerComputeImage: 10.0.13.80:8787/tripleotrain/centos-binary-ceilometer-compute:current-tripleo
+  ContainerCeilometerConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-ceilometer-central:current-tripleo
+  ContainerCeilometerNotificationImage: 10.0.13.80:8787/tripleotrain/centos-binary-ceilometer-notification:current-tripleo
   ContainerCephDaemonImage: 10.0.13.80:8787/ceph/daemon:v4.0.12-stable-4.0-nautilus-centos-7-x86_64
-  ContainerCinderApiImage: 10.0.13.80:8787/tripleotrain//openstack-cinder-api:current-tripleo
-  ContainerCinderBackupImage: 10.0.13.80:8787/tripleotrain//openstack-cinder-backup:current-tripleo
-  ContainerCinderConfigImage: 10.0.13.80:8787/tripleotrain//openstack-cinder-api:current-tripleo
-  ContainerCinderSchedulerImage: 10.0.13.80:8787/tripleotrain//openstack-cinder-scheduler:current-tripleo
-  ContainerCinderVolumeImage: 10.0.13.80:8787/tripleotrain//openstack-cinder-volume:current-tripleo
-  ContainerClustercheckConfigImage: 10.0.13.80:8787/tripleotrain//openstack-mariadb:current-tripleo
-  ContainerClustercheckImage: 10.0.13.80:8787/tripleotrain//openstack-mariadb:current-tripleo
-  ContainerCollectdConfigImage: 10.0.13.80:8787/tripleotrain//openstack-collectd:current-tripleo
-  ContainerCollectdImage: 10.0.13.80:8787/tripleotrain//openstack-collectd:current-tripleo
-  ContainerCrondConfigImage: 10.0.13.80:8787/tripleotrain//openstack-cron:current-tripleo
-  ContainerCrondImage: 10.0.13.80:8787/tripleotrain//openstack-cron:current-tripleo
-  ContainerDesignateApiImage: 10.0.13.80:8787/tripleotrain//openstack-designate-api:current-tripleo
-  ContainerDesignateBackendBIND9Image: 10.0.13.80:8787/tripleotrain//openstack-designate-backend-bind9:current-tripleo
-  ContainerDesignateCentralImage: 10.0.13.80:8787/tripleotrain//openstack-designate-central:current-tripleo
-  ContainerDesignateConfigImage: 10.0.13.80:8787/tripleotrain//openstack-designate-worker:current-tripleo
-  ContainerDesignateMDNSImage: 10.0.13.80:8787/tripleotrain//openstack-designate-mdns:current-tripleo
-  ContainerDesignateProducerImage: 10.0.13.80:8787/tripleotrain//openstack-designate-producer:current-tripleo
-  ContainerDesignateSinkImage: 10.0.13.80:8787/tripleotrain//openstack-designate-sink:current-tripleo
-  ContainerDesignateWorkerImage: 10.0.13.80:8787/tripleotrain//openstack-designate-worker:current-tripleo
-  ContainerEc2ApiConfigImage: 10.0.13.80:8787/tripleotrain//openstack-ec2-api:current-tripleo
-  ContainerEc2ApiImage: 10.0.13.80:8787/tripleotrain//openstack-ec2-api:current-tripleo
-  ContainerEtcdConfigImage: 10.0.13.80:8787/tripleotrain//openstack-etcd:current-tripleo
-  ContainerEtcdImage: 10.0.13.80:8787/tripleotrain//openstack-etcd:current-tripleo
-  ContainerGlanceApiConfigImage: 10.0.13.80:8787/tripleotrain//openstack-glance-api:current-tripleo
-  ContainerGlanceApiImage: 10.0.13.80:8787/tripleotrain//openstack-glance-api:current-tripleo
-  ContainerGnocchiApiImage: 10.0.13.80:8787/tripleotrain//openstack-gnocchi-api:current-tripleo
-  ContainerGnocchiConfigImage: 10.0.13.80:8787/tripleotrain//openstack-gnocchi-api:current-tripleo
-  ContainerGnocchiMetricdImage: 10.0.13.80:8787/tripleotrain//openstack-gnocchi-metricd:current-tripleo
-  ContainerGnocchiStatsdImage: 10.0.13.80:8787/tripleotrain//openstack-gnocchi-statsd:current-tripleo
-  ContainerHAProxyConfigImage: 10.0.13.80:8787/tripleotrain//openstack-haproxy:current-tripleo
-  ContainerHAProxyImage: 10.0.13.80:8787/tripleotrain//openstack-haproxy:current-tripleo
-  ContainerHeatApiCfnConfigImage: 10.0.13.80:8787/tripleotrain//openstack-heat-api-cfn:current-tripleo
-  ContainerHeatApiCfnImage: 10.0.13.80:8787/tripleotrain//openstack-heat-api-cfn:current-tripleo
-  ContainerHeatApiConfigImage: 10.0.13.80:8787/tripleotrain//openstack-heat-api:current-tripleo
-  ContainerHeatApiImage: 10.0.13.80:8787/tripleotrain//openstack-heat-api:current-tripleo
-  ContainerHeatConfigImage: 10.0.13.80:8787/tripleotrain//openstack-heat-api:current-tripleo
-  ContainerHeatEngineImage: 10.0.13.80:8787/tripleotrain//openstack-heat-engine:current-tripleo
-  ContainerHorizonConfigImage: 10.0.13.80:8787/tripleotrain//openstack-horizon:current-tripleo
-  ContainerHorizonImage: 10.0.13.80:8787/tripleotrain//openstack-horizon:current-tripleo
-  ContainerIronicApiConfigImage: 10.0.13.80:8787/tripleotrain//openstack-ironic-api:current-tripleo
-  ContainerIronicApiImage: 10.0.13.80:8787/tripleotrain//openstack-ironic-api:current-tripleo
-  ContainerIronicConductorImage: 10.0.13.80:8787/tripleotrain//openstack-ironic-conductor:current-tripleo
-  ContainerIronicConfigImage: 10.0.13.80:8787/tripleotrain//openstack-ironic-pxe:current-tripleo
-  ContainerIronicInspectorConfigImage: 10.0.13.80:8787/tripleotrain//openstack-ironic-inspector:current-tripleo
-  ContainerIronicInspectorImage: 10.0.13.80:8787/tripleotrain//openstack-ironic-inspector:current-tripleo
-  ContainerIronicNeutronAgentImage: 10.0.13.80:8787/tripleotrain//openstack-ironic-neutron-agent:current-tripleo
-  ContainerIronicPxeImage: 10.0.13.80:8787/tripleotrain//openstack-ironic-pxe:current-tripleo
-  ContainerIscsidConfigImage: 10.0.13.80:8787/tripleotrain//openstack-iscsid:current-tripleo
-  ContainerIscsidImage: 10.0.13.80:8787/tripleotrain//openstack-iscsid:current-tripleo
-  ContainerKeepalivedConfigImage: 10.0.13.80:8787/tripleotrain//openstack-keepalived:current-tripleo
-  ContainerKeepalivedImage: 10.0.13.80:8787/tripleotrain//openstack-keepalived:current-tripleo
-  ContainerKeystoneConfigImage: 10.0.13.80:8787/tripleotrain//openstack-keystone:current-tripleo
-  ContainerKeystoneImage: 10.0.13.80:8787/tripleotrain//openstack-keystone:current-tripleo
-  ContainerManilaApiImage: 10.0.13.80:8787/tripleotrain//openstack-manila-api:current-tripleo
-  ContainerManilaConfigImage: 10.0.13.80:8787/tripleotrain//openstack-manila-api:current-tripleo
-  ContainerManilaSchedulerImage: 10.0.13.80:8787/tripleotrain//openstack-manila-scheduler:current-tripleo
-  ContainerManilaShareImage: 10.0.13.80:8787/tripleotrain//openstack-manila-share:current-tripleo
-  ContainerMemcachedConfigImage: 10.0.13.80:8787/tripleotrain//openstack-memcached:current-tripleo
-  ContainerMemcachedImage: 10.0.13.80:8787/tripleotrain//openstack-memcached:current-tripleo
-  ContainerMetricsQdrConfigImage: 10.0.13.80:8787/tripleotrain//openstack-qdrouterd:current-tripleo
-  ContainerMetricsQdrImage: 10.0.13.80:8787/tripleotrain//openstack-qdrouterd:current-tripleo
-  ContainerMistralApiImage: 10.0.13.80:8787/tripleotrain//openstack-mistral-api:current-tripleo
-  ContainerMistralConfigImage: 10.0.13.80:8787/tripleotrain//openstack-mistral-api:current-tripleo
-  ContainerMistralEngineImage: 10.0.13.80:8787/tripleotrain//openstack-mistral-engine:current-tripleo
-  ContainerMistralEventEngineImage: 10.0.13.80:8787/tripleotrain//openstack-mistral-event-engine:current-tripleo
-  ContainerMistralExecutorImage: 10.0.13.80:8787/tripleotrain//openstack-mistral-executor:current-tripleo
-  ContainerMultipathdConfigImage: 10.0.13.80:8787/tripleotrain//openstack-multipathd:current-tripleo
-  ContainerMultipathdImage: 10.0.13.80:8787/tripleotrain//openstack-multipathd:current-tripleo
-  ContainerMysqlClientConfigImage: 10.0.13.80:8787/tripleotrain//openstack-mariadb:current-tripleo
-  ContainerMysqlConfigImage: 10.0.13.80:8787/tripleotrain//openstack-mariadb:current-tripleo
-  ContainerMysqlImage: 10.0.13.80:8787/tripleotrain//openstack-mariadb:current-tripleo
-  ContainerNeutronApiImage: 10.0.13.80:8787/tripleotrain//openstack-neutron-server-ovn:current-tripleo
-  ContainerNeutronConfigImage: 10.0.13.80:8787/tripleotrain//openstack-neutron-server-ovn:current-tripleo
-  ContainerNeutronDHCPImage: 10.0.13.80:8787/tripleotrain//openstack-neutron-dhcp-agent:current-tripleo
-  ContainerNeutronL3AgentImage: 10.0.13.80:8787/tripleotrain//openstack-neutron-l3-agent:current-tripleo
-  ContainerNeutronMetadataImage: 10.0.13.80:8787/tripleotrain//openstack-neutron-metadata-agent:current-tripleo
-  ContainerNovaApiImage: 10.0.13.80:8787/tripleotrain//openstack-nova-api:current-tripleo
-  ContainerNovaComputeImage: 10.0.13.80:8787/tripleotrain//openstack-nova-compute:current-tripleo
-  ContainerNovaComputeIronicImage: 10.0.13.80:8787/tripleotrain//openstack-nova-compute-ironic:current-tripleo
-  ContainerNovaConductorImage: 10.0.13.80:8787/tripleotrain//openstack-nova-conductor:current-tripleo
-  ContainerNovaConfigImage: 10.0.13.80:8787/tripleotrain//openstack-nova-api:current-tripleo
-  ContainerNovaLibvirtConfigImage: 10.0.13.80:8787/tripleotrain//openstack-nova-compute:current-tripleo
-  ContainerNovaLibvirtImage: 10.0.13.80:8787/tripleotrain//openstack-nova-libvirt:current-tripleo
-  ContainerNovaMetadataConfigImage: 10.0.13.80:8787/tripleotrain//openstack-nova-api:current-tripleo
-  ContainerNovaMetadataImage: 10.0.13.80:8787/tripleotrain//openstack-nova-api:current-tripleo
-  ContainerNovaSchedulerImage: 10.0.13.80:8787/tripleotrain//openstack-nova-scheduler:current-tripleo
-  ContainerNovaVncProxyImage: 10.0.13.80:8787/tripleotrain//openstack-nova-novncproxy:current-tripleo
-  ContainerOctaviaApiImage: 10.0.13.80:8787/tripleotrain//openstack-octavia-api:current-tripleo
-  ContainerOctaviaConfigImage: 10.0.13.80:8787/tripleotrain//openstack-octavia-api:current-tripleo
-  ContainerOctaviaDriverAgentConfigImage: 10.0.13.80:8787/tripleotrain//openstack-octavia-api:current-tripleo
-  ContainerOctaviaDriverAgentImage: 10.0.13.80:8787/tripleotrain//openstack-octavia-api:current-tripleo
-  ContainerOctaviaHealthManagerImage: 10.0.13.80:8787/tripleotrain//openstack-octavia-health-manager:current-tripleo
-  ContainerOctaviaHousekeepingImage: 10.0.13.80:8787/tripleotrain//openstack-octavia-housekeeping:current-tripleo
-  ContainerOctaviaRsyslogImage: 10.0.13.80:8787/tripleotrain//openstack-rsyslog:current-tripleo
-  ContainerOctaviaWorkerImage: 10.0.13.80:8787/tripleotrain//openstack-octavia-worker:current-tripleo
-  ContainerOpenvswitchImage: 10.0.13.80:8787/tripleotrain//openstack-neutron-openvswitch-agent:current-tripleo
-  ContainerOvnControllerConfigImage: 10.0.13.80:8787/tripleotrain//openstack-ovn-controller:current-tripleo
-  ContainerOvnControllerImage: 10.0.13.80:8787/tripleotrain//openstack-ovn-controller:current-tripleo
-  ContainerOvnDbsConfigImage: 10.0.13.80:8787/tripleotrain//openstack-ovn-northd:current-tripleo
-  ContainerOvnDbsImage: 10.0.13.80:8787/tripleotrain//openstack-ovn-northd:current-tripleo
-  ContainerOvnMetadataImage: 10.0.13.80:8787/tripleotrain//openstack-neutron-metadata-agent-ovn:current-tripleo
-  ContainerOvnNbDbImage: 10.0.13.80:8787/tripleotrain//openstack-ovn-nb-db-server:current-tripleo
-  ContainerOvnNorthdImage: 10.0.13.80:8787/tripleotrain//openstack-ovn-northd:current-tripleo
-  ContainerOvnSbDbImage: 10.0.13.80:8787/tripleotrain//openstack-ovn-sb-db-server:current-tripleo
-  ContainerPankoApiImage: 10.0.13.80:8787/tripleotrain//openstack-panko-api:current-tripleo
-  ContainerPankoConfigImage: 10.0.13.80:8787/tripleotrain//openstack-panko-api:current-tripleo
-  ContainerPlacementConfigImage: 10.0.13.80:8787/tripleotrain//openstack-placement-api:current-tripleo
-  ContainerPlacementImage: 10.0.13.80:8787/tripleotrain//openstack-placement-api:current-tripleo
-  ContainerQdrouterdConfigImage: 10.0.13.80:8787/tripleotrain//openstack-qdrouterd:current-tripleo
-  ContainerQdrouterdImage: 10.0.13.80:8787/tripleotrain//openstack-qdrouterd:current-tripleo
-  ContainerRabbitmqConfigImage: 10.0.13.80:8787/tripleotrain//openstack-rabbitmq:current-tripleo
-  ContainerRabbitmqImage: 10.0.13.80:8787/tripleotrain//openstack-rabbitmq:current-tripleo
-  ContainerRedisConfigImage: 10.0.13.80:8787/tripleotrain//openstack-redis:current-tripleo
-  ContainerRedisImage: 10.0.13.80:8787/tripleotrain//openstack-redis:current-tripleo
-  ContainerRsyslogConfigImage: 10.0.13.80:8787/tripleotrain//openstack-rsyslog:current-tripleo
-  ContainerRsyslogImage: 10.0.13.80:8787/tripleotrain//openstack-rsyslog:current-tripleo
-  ContainerRsyslogSidecarConfigImage: 10.0.13.80:8787/tripleotrain//openstack-rsyslog:current-tripleo
-  ContainerRsyslogSidecarImage: 10.0.13.80:8787/tripleotrain//openstack-rsyslog:current-tripleo
-  ContainerSaharaApiImage: 10.0.13.80:8787/tripleotrain//openstack-sahara-api:current-tripleo
-  ContainerSaharaConfigImage: 10.0.13.80:8787/tripleotrain//openstack-sahara-api:current-tripleo
-  ContainerSaharaEngineImage: 10.0.13.80:8787/tripleotrain//openstack-sahara-engine:current-tripleo
-  ContainerSkydiveAgentImage: 10.0.13.80:8787/tripleotrain//openstack-skydive-agent:current-tripleo
-  ContainerSkydiveAnalyzerImage: 10.0.13.80:8787/tripleotrain//openstack-skydive-analyzer:current-tripleo
-  ContainerSwiftAccountImage: 10.0.13.80:8787/tripleotrain//openstack-swift-account:current-tripleo
-  ContainerSwiftConfigImage: 10.0.13.80:8787/tripleotrain//openstack-swift-proxy-server:current-tripleo
-  ContainerSwiftContainerImage: 10.0.13.80:8787/tripleotrain//openstack-swift-container:current-tripleo
-  ContainerSwiftObjectImage: 10.0.13.80:8787/tripleotrain//openstack-swift-object:current-tripleo
-  ContainerSwiftProxyImage: 10.0.13.80:8787/tripleotrain//openstack-swift-proxy-server:current-tripleo
-  ContainerZaqarConfigImage: 10.0.13.80:8787/tripleotrain//openstack-zaqar-wsgi:current-tripleo
-  ContainerZaqarImage: 10.0.13.80:8787/tripleotrain//openstack-zaqar-wsgi:current-tripleo
+  ContainerCinderApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-cinder-api:current-tripleo
+  ContainerCinderBackupImage: 10.0.13.80:8787/tripleotrain/centos-binary-cinder-backup:current-tripleo
+  ContainerCinderConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-cinder-api:current-tripleo
+  ContainerCinderSchedulerImage: 10.0.13.80:8787/tripleotrain/centos-binary-cinder-scheduler:current-tripleo
+  ContainerCinderVolumeImage: 10.0.13.80:8787/tripleotrain/centos-binary-cinder-volume:current-tripleo
+  ContainerClustercheckConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-mariadb:current-tripleo
+  ContainerClustercheckImage: 10.0.13.80:8787/tripleotrain/centos-binary-mariadb:current-tripleo
+  ContainerCollectdConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-collectd:current-tripleo
+  ContainerCollectdImage: 10.0.13.80:8787/tripleotrain/centos-binary-collectd:current-tripleo
+  ContainerCrondConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-cron:current-tripleo
+  ContainerCrondImage: 10.0.13.80:8787/tripleotrain/centos-binary-cron:current-tripleo
+  ContainerDesignateApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-designate-api:current-tripleo
+  ContainerDesignateBackendBIND9Image: 10.0.13.80:8787/tripleotrain/centos-binary-designate-backend-bind9:current-tripleo
+  ContainerDesignateCentralImage: 10.0.13.80:8787/tripleotrain/centos-binary-designate-central:current-tripleo
+  ContainerDesignateConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-designate-worker:current-tripleo
+  ContainerDesignateMDNSImage: 10.0.13.80:8787/tripleotrain/centos-binary-designate-mdns:current-tripleo
+  ContainerDesignateProducerImage: 10.0.13.80:8787/tripleotrain/centos-binary-designate-producer:current-tripleo
+  ContainerDesignateSinkImage: 10.0.13.80:8787/tripleotrain/centos-binary-designate-sink:current-tripleo
+  ContainerDesignateWorkerImage: 10.0.13.80:8787/tripleotrain/centos-binary-designate-worker:current-tripleo
+  ContainerEc2ApiConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-ec2-api:current-tripleo
+  ContainerEc2ApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-ec2-api:current-tripleo
+  ContainerEtcdConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-etcd:current-tripleo
+  ContainerEtcdImage: 10.0.13.80:8787/tripleotrain/centos-binary-etcd:current-tripleo
+  ContainerGlanceApiConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-glance-api:current-tripleo
+  ContainerGlanceApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-glance-api:current-tripleo
+  ContainerGnocchiApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-gnocchi-api:current-tripleo
+  ContainerGnocchiConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-gnocchi-api:current-tripleo
+  ContainerGnocchiMetricdImage: 10.0.13.80:8787/tripleotrain/centos-binary-gnocchi-metricd:current-tripleo
+  ContainerGnocchiStatsdImage: 10.0.13.80:8787/tripleotrain/centos-binary-gnocchi-statsd:current-tripleo
+  ContainerHAProxyConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-haproxy:current-tripleo
+  ContainerHAProxyImage: 10.0.13.80:8787/tripleotrain/centos-binary-haproxy:current-tripleo
+  ContainerHeatApiCfnConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-heat-api-cfn:current-tripleo
+  ContainerHeatApiCfnImage: 10.0.13.80:8787/tripleotrain/centos-binary-heat-api-cfn:current-tripleo
+  ContainerHeatApiConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-heat-api:current-tripleo
+  ContainerHeatApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-heat-api:current-tripleo
+  ContainerHeatConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-heat-api:current-tripleo
+  ContainerHeatEngineImage: 10.0.13.80:8787/tripleotrain/centos-binary-heat-engine:current-tripleo
+  ContainerHorizonConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-horizon:current-tripleo
+  ContainerHorizonImage: 10.0.13.80:8787/tripleotrain/centos-binary-horizon:current-tripleo
+  ContainerIronicApiConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-ironic-api:current-tripleo
+  ContainerIronicApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-ironic-api:current-tripleo
+  ContainerIronicConductorImage: 10.0.13.80:8787/tripleotrain/centos-binary-ironic-conductor:current-tripleo
+  ContainerIronicConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-ironic-pxe:current-tripleo
+  ContainerIronicInspectorConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-ironic-inspector:current-tripleo
+  ContainerIronicInspectorImage: 10.0.13.80:8787/tripleotrain/centos-binary-ironic-inspector:current-tripleo
+  ContainerIronicNeutronAgentImage: 10.0.13.80:8787/tripleotrain/centos-binary-ironic-neutron-agent:current-tripleo
+  ContainerIronicPxeImage: 10.0.13.80:8787/tripleotrain/centos-binary-ironic-pxe:current-tripleo
+  ContainerIscsidConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-iscsid:current-tripleo
+  ContainerIscsidImage: 10.0.13.80:8787/tripleotrain/centos-binary-iscsid:current-tripleo
+  ContainerKeepalivedConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-keepalived:current-tripleo
+  ContainerKeepalivedImage: 10.0.13.80:8787/tripleotrain/centos-binary-keepalived:current-tripleo
+  ContainerKeystoneConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-keystone:current-tripleo
+  ContainerKeystoneImage: 10.0.13.80:8787/tripleotrain/centos-binary-keystone:current-tripleo
+  ContainerManilaApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-manila-api:current-tripleo
+  ContainerManilaConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-manila-api:current-tripleo
+  ContainerManilaSchedulerImage: 10.0.13.80:8787/tripleotrain/centos-binary-manila-scheduler:current-tripleo
+  ContainerManilaShareImage: 10.0.13.80:8787/tripleotrain/centos-binary-manila-share:current-tripleo
+  ContainerMemcachedConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-memcached:current-tripleo
+  ContainerMemcachedImage: 10.0.13.80:8787/tripleotrain/centos-binary-memcached:current-tripleo
+  ContainerMetricsQdrConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-qdrouterd:current-tripleo
+  ContainerMetricsQdrImage: 10.0.13.80:8787/tripleotrain/centos-binary-qdrouterd:current-tripleo
+  ContainerMistralApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-mistral-api:current-tripleo
+  ContainerMistralConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-mistral-api:current-tripleo
+  ContainerMistralEngineImage: 10.0.13.80:8787/tripleotrain/centos-binary-mistral-engine:current-tripleo
+  ContainerMistralEventEngineImage: 10.0.13.80:8787/tripleotrain/centos-binary-mistral-event-engine:current-tripleo
+  ContainerMistralExecutorImage: 10.0.13.80:8787/tripleotrain/centos-binary-mistral-executor:current-tripleo
+  ContainerMultipathdConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-multipathd:current-tripleo
+  ContainerMultipathdImage: 10.0.13.80:8787/tripleotrain/centos-binary-multipathd:current-tripleo
+  ContainerMysqlClientConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-mariadb:current-tripleo
+  ContainerMysqlConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-mariadb:current-tripleo
+  ContainerMysqlImage: 10.0.13.80:8787/tripleotrain/centos-binary-mariadb:current-tripleo
+  ContainerNeutronApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-neutron-server-ovn:current-tripleo
+  ContainerNeutronConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-neutron-server-ovn:current-tripleo
+  ContainerNeutronDHCPImage: 10.0.13.80:8787/tripleotrain/centos-binary-neutron-dhcp-agent:current-tripleo
+  ContainerNeutronL3AgentImage: 10.0.13.80:8787/tripleotrain/centos-binary-neutron-l3-agent:current-tripleo
+  ContainerNeutronMetadataImage: 10.0.13.80:8787/tripleotrain/centos-binary-neutron-metadata-agent:current-tripleo
+  ContainerNovaApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-nova-api:current-tripleo
+  ContainerNovaComputeImage: 10.0.13.80:8787/tripleotrain/centos-binary-nova-compute:current-tripleo
+  ContainerNovaComputeIronicImage: 10.0.13.80:8787/tripleotrain/centos-binary-nova-compute-ironic:current-tripleo
+  ContainerNovaConductorImage: 10.0.13.80:8787/tripleotrain/centos-binary-nova-conductor:current-tripleo
+  ContainerNovaConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-nova-api:current-tripleo
+  ContainerNovaLibvirtConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-nova-compute:current-tripleo
+  ContainerNovaLibvirtImage: 10.0.13.80:8787/tripleotrain/centos-binary-nova-libvirt:current-tripleo
+  ContainerNovaMetadataConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-nova-api:current-tripleo
+  ContainerNovaMetadataImage: 10.0.13.80:8787/tripleotrain/centos-binary-nova-api:current-tripleo
+  ContainerNovaSchedulerImage: 10.0.13.80:8787/tripleotrain/centos-binary-nova-scheduler:current-tripleo
+  ContainerNovaVncProxyImage: 10.0.13.80:8787/tripleotrain/centos-binary-nova-novncproxy:current-tripleo
+  ContainerOctaviaApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-octavia-api:current-tripleo
+  ContainerOctaviaConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-octavia-api:current-tripleo
+  ContainerOctaviaDriverAgentConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-octavia-api:current-tripleo
+  ContainerOctaviaDriverAgentImage: 10.0.13.80:8787/tripleotrain/centos-binary-octavia-api:current-tripleo
+  ContainerOctaviaHealthManagerImage: 10.0.13.80:8787/tripleotrain/centos-binary-octavia-health-manager:current-tripleo
+  ContainerOctaviaHousekeepingImage: 10.0.13.80:8787/tripleotrain/centos-binary-octavia-housekeeping:current-tripleo
+  ContainerOctaviaRsyslogImage: 10.0.13.80:8787/tripleotrain/centos-binary-rsyslog:current-tripleo
+  ContainerOctaviaWorkerImage: 10.0.13.80:8787/tripleotrain/centos-binary-octavia-worker:current-tripleo
+  ContainerOpenvswitchImage: 10.0.13.80:8787/tripleotrain/centos-binary-neutron-openvswitch-agent:current-tripleo
+  ContainerOvnControllerConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-ovn-controller:current-tripleo
+  ContainerOvnControllerImage: 10.0.13.80:8787/tripleotrain/centos-binary-ovn-controller:current-tripleo
+  ContainerOvnDbsConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-ovn-northd:current-tripleo
+  ContainerOvnDbsImage: 10.0.13.80:8787/tripleotrain/centos-binary-ovn-northd:current-tripleo
+  ContainerOvnMetadataImage: 10.0.13.80:8787/tripleotrain/centos-binary-neutron-metadata-agent-ovn:current-tripleo
+  ContainerOvnNbDbImage: 10.0.13.80:8787/tripleotrain/centos-binary-ovn-nb-db-server:current-tripleo
+  ContainerOvnNorthdImage: 10.0.13.80:8787/tripleotrain/centos-binary-ovn-northd:current-tripleo
+  ContainerOvnSbDbImage: 10.0.13.80:8787/tripleotrain/centos-binary-ovn-sb-db-server:current-tripleo
+  ContainerPankoApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-panko-api:current-tripleo
+  ContainerPankoConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-panko-api:current-tripleo
+  ContainerPlacementConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-placement-api:current-tripleo
+  ContainerPlacementImage: 10.0.13.80:8787/tripleotrain/centos-binary-placement-api:current-tripleo
+  ContainerQdrouterdConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-qdrouterd:current-tripleo
+  ContainerQdrouterdImage: 10.0.13.80:8787/tripleotrain/centos-binary-qdrouterd:current-tripleo
+  ContainerRabbitmqConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-rabbitmq:current-tripleo
+  ContainerRabbitmqImage: 10.0.13.80:8787/tripleotrain/centos-binary-rabbitmq:current-tripleo
+  ContainerRedisConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-redis:current-tripleo
+  ContainerRedisImage: 10.0.13.80:8787/tripleotrain/centos-binary-redis:current-tripleo
+  ContainerRsyslogConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-rsyslog:current-tripleo
+  ContainerRsyslogImage: 10.0.13.80:8787/tripleotrain/centos-binary-rsyslog:current-tripleo
+  ContainerRsyslogSidecarConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-rsyslog:current-tripleo
+  ContainerRsyslogSidecarImage: 10.0.13.80:8787/tripleotrain/centos-binary-rsyslog:current-tripleo
+  ContainerSaharaApiImage: 10.0.13.80:8787/tripleotrain/centos-binary-sahara-api:current-tripleo
+  ContainerSaharaConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-sahara-api:current-tripleo
+  ContainerSaharaEngineImage: 10.0.13.80:8787/tripleotrain/centos-binary-sahara-engine:current-tripleo
+  ContainerSkydiveAgentImage: 10.0.13.80:8787/tripleotrain/centos-binary-skydive-agent:current-tripleo
+  ContainerSkydiveAnalyzerImage: 10.0.13.80:8787/tripleotrain/centos-binary-skydive-analyzer:current-tripleo
+  ContainerSwiftAccountImage: 10.0.13.80:8787/tripleotrain/centos-binary-swift-account:current-tripleo
+  ContainerSwiftConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-swift-proxy-server:current-tripleo
+  ContainerSwiftContainerImage: 10.0.13.80:8787/tripleotrain/centos-binary-swift-container:current-tripleo
+  ContainerSwiftObjectImage: 10.0.13.80:8787/tripleotrain/centos-binary-swift-object:current-tripleo
+  ContainerSwiftProxyImage: 10.0.13.80:8787/tripleotrain/centos-binary-swift-proxy-server:current-tripleo
+  ContainerZaqarConfigImage: 10.0.13.80:8787/tripleotrain/centos-binary-zaqar-wsgi:current-tripleo
+  ContainerZaqarImage: 10.0.13.80:8787/tripleotrain/centos-binary-zaqar-wsgi:current-tripleo
   DockerInsecureRegistryAddress:
   - 10.0.13.80:8787
   GrafanaContainerImage: 10.0.13.80:8787/grafana/grafana:5.2.4
@@ -560,265 +556,265 @@ Nội dung file `local_registry_images.yaml`
 ```sh
 container_images:
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-aodh-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-aodh-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-aodh-evaluator:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-aodh-evaluator:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-aodh-listener:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-aodh-listener:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-aodh-notifier:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-aodh-notifier:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-barbican-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-barbican-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-barbican-keystone-listener:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-barbican-keystone-listener:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-barbican-worker:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-barbican-worker:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ceilometer-central:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ceilometer-central:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ceilometer-compute:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ceilometer-compute:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ceilometer-notification:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ceilometer-notification:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-cinder-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-cinder-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-cinder-backup:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-cinder-backup:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-cinder-scheduler:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-cinder-scheduler:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-cinder-volume:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-cinder-volume:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-collectd:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-collectd:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-cron:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-cron:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-designate-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-designate-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-designate-backend-bind9:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-designate-backend-bind9:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-designate-central:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-designate-central:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-designate-mdns:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-designate-mdns:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-designate-producer:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-designate-producer:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-designate-sink:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-designate-sink:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-designate-worker:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-designate-worker:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ec2-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ec2-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-etcd:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-etcd:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-glance-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-glance-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-gnocchi-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-gnocchi-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-gnocchi-metricd:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-gnocchi-metricd:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-gnocchi-statsd:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-gnocchi-statsd:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-haproxy:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-haproxy:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-heat-api-cfn:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-heat-api-cfn:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-heat-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-heat-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-heat-engine:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-heat-engine:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-horizon:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-horizon:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ironic-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ironic-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ironic-conductor:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ironic-conductor:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ironic-inspector:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ironic-inspector:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ironic-pxe:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ironic-pxe:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ironic-neutron-agent:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ironic-neutron-agent:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-iscsid:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-iscsid:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-keepalived:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-keepalived:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-keystone:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-keystone:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-manila-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-manila-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-manila-scheduler:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-manila-scheduler:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-manila-share:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-manila-share:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-mariadb:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-mariadb:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-memcached:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-memcached:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-mistral-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-mistral-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-mistral-engine:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-mistral-engine:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-mistral-executor:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-mistral-executor:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-mistral-event-engine:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-mistral-event-engine:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-multipathd:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-multipathd:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-neutron-dhcp-agent:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-neutron-dhcp-agent:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-neutron-l3-agent:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-neutron-l3-agent:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-neutron-metadata-agent:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-neutron-metadata-agent:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-neutron-openvswitch-agent:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-neutron-openvswitch-agent:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-neutron-server-ovn:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-neutron-server-ovn:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-neutron-metadata-agent-ovn:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-neutron-metadata-agent-ovn:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-nova-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-nova-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-nova-compute-ironic:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-nova-compute-ironic:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-nova-compute:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-nova-compute:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-nova-conductor:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-nova-conductor:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-nova-libvirt:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-nova-libvirt:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-nova-novncproxy:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-nova-novncproxy:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-nova-scheduler:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-nova-scheduler:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-octavia-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-octavia-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-octavia-health-manager:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-octavia-health-manager:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-octavia-housekeeping:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-octavia-housekeeping:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-octavia-worker:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-octavia-worker:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ovn-controller:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ovn-controller:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ovn-nb-db-server:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ovn-nb-db-server:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ovn-northd:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ovn-northd:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-ovn-sb-db-server:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-ovn-sb-db-server:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-panko-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-panko-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-placement-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-placement-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-qdrouterd:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-qdrouterd:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-rabbitmq:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-rabbitmq:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-redis:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-redis:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-sahara-api:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-sahara-api:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-sahara-engine:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-sahara-engine:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-skydive-agent:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-skydive-agent:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-skydive-analyzer:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-skydive-analyzer:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-swift-account:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-swift-account:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-swift-container:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-swift-container:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-swift-object:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-swift-object:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-swift-proxy-server:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-swift-proxy-server:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-zaqar-wsgi:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-zaqar-wsgi:current-tripleo
   push_destination: 10.0.13.80:8787
 - image_source: ceph
   imagename: docker.io/ceph/daemon:v4.0.12-stable-4.0-nautilus-centos-7-x86_64
@@ -836,8 +832,9 @@ container_images:
   imagename: docker.io/grafana/grafana:5.2.4
   push_destination: 10.0.13.80:8787
 - image_source: kolla
-  imagename: docker.io/tripleotrain//openstack-rsyslog:current-tripleo
+  imagename: docker.io/tripleotrain/centos-binary-rsyslog:current-tripleo
   push_destination: 10.0.13.80:8787
+
 ```
 
 ### 3.5. Tạo file `05-network-environment.yaml`
