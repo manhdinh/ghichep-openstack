@@ -4,7 +4,7 @@ Triển khai Triple O với mô hình đơn giản bao gồm :
  - 01 node Director
  - 03 node Controller
  - 03 node Compute
- - 01 node Storage (External, cài riêng)
+ - 03 node Storage (External, cài riêng)
 
 ## I. Mô hình cài đặt và IP-Planning
 
@@ -2054,3 +2054,5 @@ openstack overcloud deploy --templates \
 -e /home/stack/custom-templates/15-docker-ha.yaml \
 --log-file overcloud_deployment.log --timeout 360
 ```
+
+Thực hiện đợi quá trình deployment (mất khoảng ~60p)
