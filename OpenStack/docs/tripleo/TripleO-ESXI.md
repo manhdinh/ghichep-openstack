@@ -2055,4 +2055,16 @@ openstack overcloud deploy --templates \
 --log-file overcloud_deployment.log --timeout 360
 ```
 
-Thực hiện đợi quá trình deployment (mất khoảng ~60p)
+Thực hiện đợi quá trình deployment (mất khoảng ~60p). Sau khi triển khai thành công sẽ báo như sau : 
+
+![tripleo](/OpenStack/images/tripleo-esxi-12.png)
+
+Thực hiện kiểm tra password của các user trong OPS :
+
+```sh
+openstack object save overcloud plan-environment.yaml
+```
+
+Kiểm tra thông tin tại file `plan-environment.yaml` : 
+
+
