@@ -126,3 +126,28 @@ num_workers: 8
 ```
 
 Nên nhớ rằng thêm quá nhiều worker có thể khiến giảm hiệu năng. Chúng tôi khuyến cáo răng 1 worker/ 1 cpu, tối đa tổng 8 worker
+
+# III. Enable High Avalability
+
+MAAS cung cấp việc cấu hình HA trên cả region và rack. CÁc thành phần có thể HA là : 
+ 
+ 1. BMC (node power cycling)
+ 2. DHCP
+ 3. PostgreSQL
+ 4. API services
+ 
+ ## 1. Cấu hình HA cho Rack controller
+ 
+ Bạn cần cài đặt multiple rack controller để có thể xử lý HA. Khi cài đặt xong, bạn có thể tự động có HA trong BMC control và có thể enable HA cho DHCP.
+ 
+ ### 1.1. Enable HA BMC
+ 
+ HA cho BMC control (node power cycling) được cung cấp để sử dụng luôn, một khi có rack controller thứ 2, MAAS sẽ tự động chỉ định rack controller chịu trách nhiệm cho BMC và cấu hình việc giao tiếp giữa chúng.
+ 
+ ### 1.2. Enable HA cho dịch vụ DHCP 
+ 
+ DHCP HA sẽ ảnh hưởng tới cách MAAS quản lý node, bao gồm việc enlist, comission và deploy. Nó sẽ enable primary và secondary DHCP instance để phục vụ cùng 1 VLAN. VLAN này sẽ relicate các thông tin cấp phát giữa rack controller, việc HA DHCP sẽ yêu cầu DHCP được quản lý bởi MAAS.
+ 
+ Nếu bạn đã enable DHCP lần đầu tiên sau khi thêm rack controller thứ 2, hãy tham khảo (Enable DHCP)[.]. Mặt khác, nếu bạn đã bật sẵn DHCP khi cài đặt rack controller, bạn sẽ cần re-config DHCP.
+ 
+Truy cập
